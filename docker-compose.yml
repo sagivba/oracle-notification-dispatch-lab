@@ -1,0 +1,33 @@
+services:
+  # Retained Python/Flask starter service.
+  # This service is kept only as starter Python/test/CI infrastructure.
+  # It is not part of the Oracle database lab runtime or functional DB iterations.
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PYTHONPATH: /app/src
+      FLASK_ENV: production
+    ports:
+      - "5000:5000"
+
+  db:
+    image: ${ORACLE_IMAGE:-container-registry.oracle.com/database/free:latest}
+    container_name: oracle-dev-ai-lab-db
+    environment:
+      ORACLE_PWD: ${ORACLE_PWD:?Set ORACLE_PWD in local .env before starting the lab}
+    ports:
+      - "${ORACLE_HOST_PORT:-1521}:1521"
+    volumes:
+      - oracle-dev-ai-lab-u01:/opt/oracle/oradata
+    networks:
+      - oracle-dev-ai-lab-net
+
+volumes:
+  oracle-dev-ai-lab-u01:
+    name: oracle-dev-ai-lab-u01
+
+networks:
+  oracle-dev-ai-lab-net:
+    name: oracle-dev-ai-lab-net

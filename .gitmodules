@@ -1,0 +1,3 @@
+[submodule "tools/ai-git-workflow-tools"]
+	path = tools/ai-git-workflow-tools
+	url = https://github.com/sagivba/ai-git-workflow-tools.git

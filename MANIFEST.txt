@@ -1,0 +1,14 @@
+.agents/oracle-notification-dispatch-codex-developer/SKILL.md
+AGENTS.md
+README.md
+docs/agw-workflow.md
+docs/codex-runtime-modes.md
+docs/database-change-rules.md
+docs/development-workflow.md
+docs/local-runtime.md
+docs/project-overview.md
+docs/repository-structure.md
+docs/safety-rules.md
+docs/sqlcl-installation.md
+specs/001-notification-dispatch/README.md
+specs/001-notification-dispatch/spec.md

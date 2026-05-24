@@ -1,0 +1,172 @@
+erDiagram
+  NOTIF_EXTERNAL_SYSTEMS ||--o{ NOTIF_RECIPIENTS : provides
+  NOTIF_RECIPIENTS ||--o{ NOTIF_RECIPIENT_CHANNELS : has
+  NOTIF_CHANNELS ||--o{ NOTIF_RECIPIENT_CHANNELS : supports
+
+  NOTIF_MESSAGE_TEMPLATES ||--o{ NOTIF_TEMPLATE_CHANNEL_CONTENTS : has
+  NOTIF_CHANNELS ||--o{ NOTIF_TEMPLATE_CHANNEL_CONTENTS : formats
+
+  NOTIF_MESSAGE_TEMPLATES ||--o{ NOTIF_DISPATCH_REQUESTS : used_by
+  NOTIF_STATUS_CODES ||--o{ NOTIF_DISPATCH_REQUESTS : request_status
+
+  NOTIF_DISPATCH_REQUESTS ||--o{ NOTIF_DISPATCH_ITEMS : contains
+  NOTIF_RECIPIENTS ||--o{ NOTIF_DISPATCH_ITEMS : receives
+  NOTIF_RECIPIENT_CHANNELS ||--o{ NOTIF_DISPATCH_ITEMS : target
+  NOTIF_CHANNELS ||--o{ NOTIF_DISPATCH_ITEMS : channel
+  NOTIF_TEMPLATE_CHANNEL_CONTENTS ||--o{ NOTIF_DISPATCH_ITEMS : content_source
+  NOTIF_STATUS_CODES ||--o{ NOTIF_DISPATCH_ITEMS : item_status
+
+  NOTIF_DISPATCH_ITEMS ||--|| NOTIF_DISPATCH_ITEM_CONTENTS : snapshot
+  NOTIF_DISPATCH_ITEMS ||--o{ NOTIF_DELIVERY_ATTEMPTS : attempts
+  NOTIF_STATUS_CODES ||--o{ NOTIF_DELIVERY_ATTEMPTS : attempt_status
+
+  NOTIF_DELIVERY_ATTEMPTS ||--o{ NOTIF_PROVIDER_RESPONSES : responses
+
+  NOTIF_CHANNELS {
+    NUMBER channel_id PK
+    VARCHAR2 channel_code UK
+    VARCHAR2 channel_name
+    VARCHAR2 description
+    CHAR is_active
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  NOTIF_STATUS_CODES {
+    VARCHAR2 status_code PK
+    VARCHAR2 status_group
+    VARCHAR2 status_name
+    VARCHAR2 description
+    CHAR is_terminal
+    CHAR is_success
+    CHAR is_active
+    NUMBER sort_order
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  NOTIF_EXTERNAL_SYSTEMS {
+    NUMBER external_system_id PK
+    VARCHAR2 external_system_code UK
+    VARCHAR2 external_system_name
+    VARCHAR2 description
+    CHAR is_active
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  NOTIF_MESSAGE_TEMPLATES {
+    NUMBER template_id PK
+    VARCHAR2 template_code UK
+    VARCHAR2 template_name
+    VARCHAR2 description
+    CHAR is_active
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  NOTIF_TEMPLATE_CHANNEL_CONTENTS {
+    NUMBER template_channel_content_id PK
+    NUMBER template_id FK
+    NUMBER channel_id FK
+    VARCHAR2 content_format
+    VARCHAR2 subject_template
+    CLOB body_template
+    VARCHAR2 short_body_template
+    CLOB provider_payload_template
+    CHAR is_active
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  NOTIF_RECIPIENTS {
+    NUMBER recipient_id PK
+    NUMBER external_system_id FK
+    VARCHAR2 external_recipient_id
+    VARCHAR2 display_name
+    CHAR is_active
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  NOTIF_RECIPIENT_CHANNELS {
+    NUMBER recipient_channel_id PK
+    NUMBER recipient_id FK
+    NUMBER channel_id FK
+    VARCHAR2 address_value
+    CHAR is_primary
+    CHAR is_active
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  NOTIF_DISPATCH_REQUESTS {
+    NUMBER dispatch_request_id PK
+    NUMBER template_id FK
+    VARCHAR2 request_status_code FK
+    VARCHAR2 request_title
+    VARCHAR2 requested_by
+    TIMESTAMP requested_at
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  NOTIF_DISPATCH_ITEMS {
+    NUMBER dispatch_item_id PK
+    NUMBER dispatch_request_id FK
+    NUMBER recipient_id FK
+    NUMBER recipient_channel_id FK
+    NUMBER channel_id FK
+    NUMBER template_channel_content_id FK
+    VARCHAR2 item_status_code FK
+    NUMBER attempt_count
+    TIMESTAMP last_attempt_at
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  NOTIF_DISPATCH_ITEM_CONTENTS {
+    NUMBER dispatch_item_id PK,FK
+    VARCHAR2 recipient_display_name_snapshot
+    VARCHAR2 recipient_external_id_snapshot
+    VARCHAR2 recipient_address_snapshot
+    VARCHAR2 subject_snapshot
+    CLOB body_snapshot
+    VARCHAR2 content_format_snapshot
+    TIMESTAMP created_at
+  }
+
+  NOTIF_DELIVERY_ATTEMPTS {
+    NUMBER delivery_attempt_id PK
+    NUMBER dispatch_item_id FK
+    NUMBER attempt_number
+    VARCHAR2 attempt_status_code FK
+    TIMESTAMP started_at
+    TIMESTAMP finished_at
+    VARCHAR2 result_code
+    VARCHAR2 result_message
+    TIMESTAMP created_at
+  }
+
+  NOTIF_PROVIDER_RESPONSES {
+    NUMBER provider_response_id PK
+    NUMBER delivery_attempt_id FK
+    VARCHAR2 provider_code
+    VARCHAR2 provider_message_id
+    VARCHAR2 response_code
+    VARCHAR2 response_message
+    CLOB response_payload
+    TIMESTAMP received_at
+  }
+
+  NOTIF_AUDIT_LOG {
+    NUMBER audit_log_id PK
+    VARCHAR2 entity_name
+    NUMBER entity_id
+    VARCHAR2 action_code
+    VARCHAR2 old_status_code
+    VARCHAR2 new_status_code
+    CLOB action_details
+    VARCHAR2 created_by
+    TIMESTAMP created_at
+  }

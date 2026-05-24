@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Oracle Notification Dispatch Lab - אפיון מודל נתונים</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f6f7f9;
+      color: #1f2933;
+      line-height: 1.65;
+    }
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 32px 46px 80px;
+      box-shadow: 0 0 18px rgba(0,0,0,0.08);
+    }
+    h1, h2, h3, h4 {
+      color: #111827;
+      line-height: 1.28;
+    }
+    h1 {
+      border-bottom: 3px solid #111827;
+      padding-bottom: 14px;
+      margin-bottom: 24px;
+    }
+    h2 {
+      margin-top: 42px;
+      border-bottom: 1px solid #d0d7de;
+      padding-bottom: 8px;
+    }
+    h3 {
+      margin-top: 32px;
+      background: #eef2f7;
+      padding: 10px 14px;
+      border-right: 5px solid #374151;
+      border-radius: 6px;
+    }
+    h4 {
+      margin-top: 22px;
+    }
+    p, li {
+      font-size: 15px;
+    }
+    code, pre {
+      direction: ltr;
+      text-align: left;
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      background: #f3f4f6;
+      border-radius: 6px;
+    }
+    code {
+      padding: 2px 5px;
+    }
+    pre {
+      padding: 14px 18px;
+      overflow-x: auto;
+      border: 1px solid #d1d5db;
+      white-space: pre;
+      font-size: 13px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 26px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #d1d5db;
+      padding: 8px 10px;
+      vertical-align: top;
+    }
+    th {
+      background: #f3f4f6;
+      font-weight: 700;
+    }
+    td.code, th.code {
+      direction: ltr;
+      text-align: left;
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      white-space: nowrap;
+    }
+    .meta {
+      background: #eef6ff;
+      border: 1px solid #bcd7f5;
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 18px 0;
+    }
+    .decision {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-right: 5px solid #334155;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 14px 0;
+    }
+    .warning {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-right: 5px solid #f97316;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 14px 0;
+    }
+    .danger {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-right: 5px solid #dc2626;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 14px 0;
+    }
+    .ok {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-right: 5px solid #16a34a;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 14px 0;
+    }
+    .small {
+      font-size: 13px;
+      color: #4b5563;
+    }
+    .toc li {
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+<main>
+
+<h1>Oracle Notification Dispatch Lab - אפיון מודל נתונים</h1>
+
+<section class="meta">
+  <p><strong>סוג מסמך:</strong> אפיון מודל נתונים לשכבת בסיס הנתונים.</p>
+  <p><strong>פרויקט:</strong> Oracle Notification Dispatch Lab.</p>
+  <p><strong>תחום עסקי:</strong> מערכת דמיונית להפצת הודעות ומסרים רב-ערוצית.</p>
+  <p><strong>שפת האפיון:</strong> עברית. שמות אובייקטים, עמודות ותגיות טכניות נשארים באנגלית לצורך DDL ו-Codex.</p>
+  <p><strong>סטטוס:</strong> טיוטת אפיון ראשונה לסקירה.</p>
+</section>
+
+<h2>1. מטרת מודל הנתונים</h2>
+
+<p>
+מטרת מודל הנתונים היא להגדיר שכבת בסיס נתונים עבור מערכת דמיונית שמנהלת בקשות להפצת הודעות ומסרים בערוצים שונים.
+המערכת אינה שולחת הודעות בפועל ואינה מתחברת לספקים אמיתיים.
+היא מנהלת את המידע הנדרש כדי לתאר הודעות, ערוצים, נמענים, פריטי הפצה, ניסיונות שליחה, תגובות ספק דמיוניות ולוג ביקורת.
+</p>
+
+<div class="decision">
+  <strong>החלטת יסוד:</strong>
+  גוף ההודעה תלוי בערוץ. לכן תבנית הודעה היא ישות לוגית, והתוכן בפועל נשמר לפי שילוב של תבנית וערוץ.
+</div>
+
+<div class="decision">
+  <strong>החלטת יסוד:</strong>
+  נמענים מגיעים ממערכת חיצונית. המערכת שומרת נמען מקומי לפי מזהה חיצוני ייחודי, מקשרת אותו לפריטי הפצה, ושומרת snapshot של פרטי הנמען והתוכן בזמן יצירת פריט ההפצה.
+</div>
+
+<div class="decision">
+  <strong>החלטת יסוד:</strong>
+  Git הוא מקור האמת. כל אובייקט DB חייב להיות ניתן ליצירה מתוך קובצי SQL מנוהלים ב-Git.
+</div>
+
+<h2>2. הנחות נפח לשנה ראשונה</h2>
+
+<p>
+המספרים הבאים הם אומדני תכנון לצורך קבלת החלטות על אינדקסים, חלוקת טבלאות, partitioning ו-retention.
+הם אינם נתוני אמת ואינם מייצגים מערכת ארגונית אמיתית.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>מדד</th>
+      <th>אומדן לשנה</th>
+      <th>הערה</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>נמענים ייחודיים</td><td class="code">300,000</td><td>נמענים ממערכות חיצוניות, נשמרים פעם אחת לפי מזהה חיצוני.</td></tr>
+    <tr><td>יעדי ערוץ לנמען</td><td class="code">600,000-1,000,000</td><td>ייתכנו כמה ערוצים או כמה יעדים לאותו נמען.</td></tr>
+    <tr><td>תבניות הודעה לוגיות</td><td class="code">100-1,000</td><td>תבנית עסקית אחת יכולה לקבל תוכן שונה לכל ערוץ.</td></tr>
+    <tr><td>בקשות הפצה</td><td class="code">1,200,000</td><td>כ-100,000 בקשות בחודש.</td></tr>
+    <tr><td>פריטי הפצה</td><td class="code">60,000,000</td><td>ממוצע 50 נמענים/ערוצים לבקשת הפצה.</td></tr>
+    <tr><td>ניסיונות שליחה</td><td class="code">72,000,000</td><td>ממוצע 1.2 ניסיונות לפריט, כולל retries דמיוניים.</td></tr>
+    <tr><td>תגובות ספק דמיוניות</td><td class="code">72,000,000</td><td>תגובה אחת בממוצע לכל ניסיון.</td></tr>
+    <tr><td>אירועי audit</td><td class="code">100,000,000+</td><td>עשוי להיות גדול מאוד אם מתעדים כל שינוי סטטוס.</td></tr>
+  </tbody>
+</table>
+
+<h2>3. כלל Partitioning</h2>
+
+<div class="warning">
+  <strong>כלל תכנון:</strong>
+  כל טבלה שצפויה לעבור 2GB לאחר כשנה של שימוש חייבת לקבל באפיון דרישת partitioning.
+</div>
+
+<p>
+ברירת המחדל לטבלאות גדולות היא:
+</p>
+
+<pre><code>Range partitioning by time column
+Default granularity: monthly partitions</code></pre>
+
+<p>
+מפתחות partition מומלצים לפי סוג טבלה:
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>סוג טבלה</th>
+      <th>מפתח partition מומלץ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>בקשות הפצה</td><td class="code">REQUESTED_AT</td></tr>
+    <tr><td>פריטי הפצה</td><td class="code">CREATED_AT</td></tr>
+    <tr><td>תוכן snapshot לפריט הפצה</td><td class="code">CREATED_AT</td></tr>
+    <tr><td>ניסיונות שליחה</td><td class="code">STARTED_AT</td></tr>
+    <tr><td>תגובות ספק</td><td class="code">RECEIVED_AT</td></tr>
+    <tr><td>Audit</td><td class="code">CREATED_AT</td></tr>
+  </tbody>
+</table>
+
+<p class="small">
+הערה: לפני מימוש פיזי של partitioning יש לוודא התאמה לגרסת Oracle, למהדורה וליכולות סביבת המעבדה.
+</p>
+
+<h2>4. רשימת טבלאות וסיווג</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>טבלה</th>
+      <th>סוג</th>
+      <th>אומדן רשומות בשנה</th>
+      <th>אומדן גודל בשנה</th>
+      <th>Partitioning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td class="code">NOTIF_CHANNELS</td><td>Reference</td><td>10-50</td><td>&lt;10MB</td><td>לא</td></tr>
+    <tr><td class="code">NOTIF_STATUS_CODES</td><td>Reference</td><td>20-100</td><td>&lt;10MB</td><td>לא</td></tr>
+    <tr><td class="code">NOTIF_EXTERNAL_SYSTEMS</td><td>Reference</td><td>5-30</td><td>&lt;10MB</td><td>לא</td></tr>
+    <tr><td class="code">NOTIF_MESSAGE_TEMPLATES</td><td>Master</td><td>100-1,000</td><td>&lt;100MB</td><td>לא</td></tr>
+    <tr><td class="code">NOTIF_TEMPLATE_CHANNEL_CONTENTS</td><td>Master detail + LOB</td><td>500-5,000</td><td>100MB-1GB</td><td>לא</td></tr>
+    <tr><td class="code">NOTIF_RECIPIENTS</td><td>Master</td><td>300,000</td><td>200MB-800MB</td><td>לא</td></tr>
+    <tr><td class="code">NOTIF_RECIPIENT_CHANNELS</td><td>Master detail</td><td>600,000-1,000,000</td><td>500MB-1.5GB</td><td>לא</td></tr>
+    <tr><td class="code">NOTIF_DISPATCH_REQUESTS</td><td>Transaction header</td><td>1,200,000</td><td>1GB-2GB</td><td>גבולי</td></tr>
+    <tr><td class="code">NOTIF_DISPATCH_ITEMS</td><td>Transaction detail</td><td>60,000,000</td><td>8GB-20GB</td><td>כן</td></tr>
+    <tr><td class="code">NOTIF_DISPATCH_ITEM_CONTENTS</td><td>Snapshot + LOB</td><td>60,000,000</td><td>20GB-80GB</td><td>כן</td></tr>
+    <tr><td class="code">NOTIF_DELIVERY_ATTEMPTS</td><td>Transaction log</td><td>72,000,000</td><td>8GB-25GB</td><td>כן</td></tr>
+    <tr><td class="code">NOTIF_PROVIDER_RESPONSES</td><td>Transaction log + LOB</td><td>72,000,000</td><td>10GB-50GB</td><td>כן</td></tr>
+    <tr><td class="code">NOTIF_AUDIT_LOG</td><td>Audit log + LOB</td><td>100,000,000+</td><td>20GB-100GB</td><td>כן</td></tr>
+  </tbody>
+</table>
+
+<h2>5. קשרים לוגיים בין הטבלאות</h2>
+
+<pre><code>NOTIF_EXTERNAL_SYSTEMS
+  1 -> N NOTIF_RECIPIENTS
+
+NOTIF_RECIPIENTS
+  1 -> N NOTIF_RECIPIENT_CHANNELS
+
+NOTIF_CHANNELS
+  1 -> N NOTIF_RECIPIENT_CHANNELS
+
+NOTIF_MESSAGE_TEMPLATES
+  1 -> N NOTIF_TEMPLATE_CHANNEL_CONTENTS
+
+NOTIF_CHANNELS
+  1 -> N NOTIF_TEMPLATE_CHANNEL_CONTENTS
+
+NOTIF_MESSAGE_TEMPLATES
+  1 -> N NOTIF_DISPATCH_REQUESTS
+
+NOTIF_DISPATCH_REQUESTS
+  1 -> N NOTIF_DISPATCH_ITEMS
+
+NOTIF_RECIPIENTS
+  1 -> N NOTIF_DISPATCH_ITEMS
+
+NOTIF_RECIPIENT_CHANNELS
+  1 -> N NOTIF_DISPATCH_ITEMS
+
+NOTIF_CHANNELS
+  1 -> N NOTIF_DISPATCH_ITEMS
+
+NOTIF_TEMPLATE_CHANNEL_CONTENTS
+  1 -> N NOTIF_DISPATCH_ITEMS
+
+NOTIF_DISPATCH_ITEMS
+  1 -> 1 NOTIF_DISPATCH_ITEM_CONTENTS
+
+NOTIF_DISPATCH_ITEMS
+  1 -> N NOTIF_DELIVERY_ATTEMPTS
+
+NOTIF_DELIVERY_ATTEMPTS
+  1 -> N NOTIF_PROVIDER_RESPONSES
+
+NOTIF_STATUS_CODES
+  1 -> N NOTIF_DISPATCH_REQUESTS
+  1 -> N NOTIF_DISPATCH_ITEMS
+  1 -> N NOTIF_DELIVERY_ATTEMPTS</code></pre>
+
+<h2>6. פירוט טבלאות</h2>
+
+<!-- TABLE: NOTIF_CHANNELS -->
+<h3>6.1 NOTIF_CHANNELS</h3>
+
+<p>
+טבלת ערוצי הפצה. מגדירה אילו ערוצים קיימים במערכת, למשל EMAIL, WHATSAPP, TELEGRAM, SMS או PUSH.
+</p>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_CHANNELS
+@table_type: reference
+@business_purpose: הגדרת ערוצי הפצה נתמכים.
+@expected_rows_after_1y: 10-50
+@expected_size_after_1y: &lt;10MB
+@partitioning_required: NO
+@retention_policy: שמירה ללא הגבלת זמן
+@source_of_truth: seed data מנוהל ב-Git
+@contains_lob: NO
+@contains_person_like_data: NO</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_CHANNELS IS
+'טבלת ערוצי הפצה נתמכים עבור הודעות ומסרים, כגון EMAIL, WHATSAPP, TELEGRAM, SMS וערוצים עתידיים.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">CHANNEL_ID</td><td class="code">NUMBER</td><td>כן</td><td>PK</td><td>מזהה פנימי של ערוץ ההפצה.</td><td class="code">@generated_key YES</td></tr>
+    <tr><td class="code">CHANNEL_CODE</td><td class="code">VARCHAR2(30)</td><td>כן</td><td>UK</td><td>קוד עסקי ייחודי לערוץ, למשל EMAIL או WHATSAPP.</td><td class="code">@business_key YES</td></tr>
+    <tr><td class="code">CHANNEL_NAME</td><td class="code">VARCHAR2(100)</td><td>כן</td><td></td><td>שם תצוגה של הערוץ.</td><td></td></tr>
+    <tr><td class="code">DESCRIPTION</td><td class="code">VARCHAR2(500)</td><td>לא</td><td></td><td>תיאור הערוץ והשימוש הצפוי בו.</td><td></td></tr>
+    <tr><td class="code">IS_ACTIVE</td><td class="code">CHAR(1)</td><td>כן</td><td>CHECK</td><td>האם הערוץ פעיל. ערכים מותרים: Y/N.</td><td class="code">@allowed_values Y,N</td></tr>
+    <tr><td class="code">CREATED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td></td><td>מועד יצירת הרשומה.</td><td class="code">@default SYSTIMESTAMP</td></tr>
+    <tr><td class="code">UPDATED_AT</td><td class="code">TIMESTAMP</td><td>לא</td><td></td><td>מועד עדכון אחרון.</td><td></td></tr>
+  </tbody>
+</table>
+
+<h4>Constraints ואינדקסים</h4>
+<pre><code>PK:  NOTIF_CHANNELS_PK(CHANNEL_ID)
+UK:  NOTIF_CHANNELS_UK1(CHANNEL_CODE)
+CHK: NOTIF_CHANNELS_CHK_ACTIVE(IS_ACTIVE IN ('Y','N'))</code></pre>
+
+<h4>SQL column comments</h4>
+<pre><code>COMMENT ON COLUMN AI_APP_OWNER.NOTIF_CHANNELS.CHANNEL_ID IS 'מזהה פנימי של ערוץ ההפצה.';
+COMMENT ON COLUMN AI_APP_OWNER.NOTIF_CHANNELS.CHANNEL_CODE IS 'קוד עסקי ייחודי לערוץ, למשל EMAIL או WHATSAPP.';
+COMMENT ON COLUMN AI_APP_OWNER.NOTIF_CHANNELS.CHANNEL_NAME IS 'שם תצוגה של הערוץ.';
+COMMENT ON COLUMN AI_APP_OWNER.NOTIF_CHANNELS.DESCRIPTION IS 'תיאור הערוץ והשימוש הצפוי בו.';
+COMMENT ON COLUMN AI_APP_OWNER.NOTIF_CHANNELS.IS_ACTIVE IS 'האם הערוץ פעיל. ערכים מותרים: Y/N.';
+COMMENT ON COLUMN AI_APP_OWNER.NOTIF_CHANNELS.CREATED_AT IS 'מועד יצירת הרשומה.';
+COMMENT ON COLUMN AI_APP_OWNER.NOTIF_CHANNELS.UPDATED_AT IS 'מועד עדכון אחרון.';</code></pre>
+
+<!-- TABLE: NOTIF_STATUS_CODES -->
+<h3>6.2 NOTIF_STATUS_CODES</h3>
+
+<p>
+טבלת סטטוסים כללית לבקשות הפצה, פריטי הפצה וניסיונות שליחה.
+</p>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_STATUS_CODES
+@table_type: reference
+@business_purpose: הגדרת סטטוסים לשימוש חוזר במערכת.
+@expected_rows_after_1y: 20-100
+@expected_size_after_1y: &lt;10MB
+@partitioning_required: NO
+@retention_policy: שמירה ללא הגבלת זמן
+@source_of_truth: seed data מנוהל ב-Git
+@contains_lob: NO
+@contains_person_like_data: NO</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_STATUS_CODES IS
+'טבלת קודי סטטוס לשימוש בבקשות הפצה, פריטי הפצה וניסיונות שליחה.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">STATUS_CODE</td><td class="code">VARCHAR2(30)</td><td>כן</td><td>PK</td><td>קוד סטטוס ייחודי.</td><td class="code">@business_key YES</td></tr>
+    <tr><td class="code">STATUS_GROUP</td><td class="code">VARCHAR2(30)</td><td>כן</td><td>IDX</td><td>קבוצת הסטטוס, למשל REQUEST, ITEM או ATTEMPT.</td><td></td></tr>
+    <tr><td class="code">STATUS_NAME</td><td class="code">VARCHAR2(100)</td><td>כן</td><td></td><td>שם תצוגה של הסטטוס.</td><td></td></tr>
+    <tr><td class="code">DESCRIPTION</td><td class="code">VARCHAR2(500)</td><td>לא</td><td></td><td>תיאור משמעות הסטטוס.</td><td></td></tr>
+    <tr><td class="code">IS_TERMINAL</td><td class="code">CHAR(1)</td><td>כן</td><td>CHECK</td><td>האם הסטטוס סופי.</td><td class="code">@allowed_values Y,N</td></tr>
+    <tr><td class="code">IS_SUCCESS</td><td class="code">CHAR(1)</td><td>כן</td><td>CHECK</td><td>האם הסטטוס מייצג הצלחה.</td><td class="code">@allowed_values Y,N</td></tr>
+    <tr><td class="code">IS_ACTIVE</td><td class="code">CHAR(1)</td><td>כן</td><td>CHECK</td><td>האם הסטטוס פעיל.</td><td class="code">@allowed_values Y,N</td></tr>
+    <tr><td class="code">SORT_ORDER</td><td class="code">NUMBER</td><td>לא</td><td></td><td>סדר תצוגה לוגי.</td><td></td></tr>
+    <tr><td class="code">CREATED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td></td><td>מועד יצירת הרשומה.</td><td class="code">@default SYSTIMESTAMP</td></tr>
+    <tr><td class="code">UPDATED_AT</td><td class="code">TIMESTAMP</td><td>לא</td><td></td><td>מועד עדכון אחרון.</td><td></td></tr>
+  </tbody>
+</table>
+
+<h4>Constraints ואינדקסים</h4>
+<pre><code>PK:  NOTIF_STATUS_CODES_PK(STATUS_CODE)
+IDX: NOTIF_STATUS_CODES_IX1(STATUS_GROUP)
+CHK: NOTIF_STATUS_CODES_CHK_TERMINAL(IS_TERMINAL IN ('Y','N'))
+CHK: NOTIF_STATUS_CODES_CHK_SUCCESS(IS_SUCCESS IN ('Y','N'))
+CHK: NOTIF_STATUS_CODES_CHK_ACTIVE(IS_ACTIVE IN ('Y','N'))</code></pre>
+
+<!-- TABLE: NOTIF_EXTERNAL_SYSTEMS -->
+<h3>6.3 NOTIF_EXTERNAL_SYSTEMS</h3>
+
+<p>
+טבלת מערכות חיצוניות שמספקות נמענים למערכת.
+</p>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_EXTERNAL_SYSTEMS
+@table_type: reference
+@business_purpose: זיהוי מערכות חיצוניות שמספקות מזהי נמענים.
+@expected_rows_after_1y: 5-30
+@expected_size_after_1y: &lt;10MB
+@partitioning_required: NO
+@retention_policy: שמירה ללא הגבלת זמן
+@source_of_truth: seed data או setup מבוקר
+@contains_lob: NO
+@contains_person_like_data: NO</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_EXTERNAL_SYSTEMS IS
+'טבלת מערכות חיצוניות שמספקות מזהי נמענים לשכבת בסיס הנתונים של מערכת ההודעות.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">EXTERNAL_SYSTEM_ID</td><td class="code">NUMBER</td><td>כן</td><td>PK</td><td>מזהה פנימי של מערכת חיצונית.</td><td class="code">@generated_key YES</td></tr>
+    <tr><td class="code">EXTERNAL_SYSTEM_CODE</td><td class="code">VARCHAR2(50)</td><td>כן</td><td>UK</td><td>קוד ייחודי של המערכת החיצונית.</td><td class="code">@business_key YES</td></tr>
+    <tr><td class="code">EXTERNAL_SYSTEM_NAME</td><td class="code">VARCHAR2(200)</td><td>כן</td><td></td><td>שם תצוגה של המערכת החיצונית.</td><td></td></tr>
+    <tr><td class="code">DESCRIPTION</td><td class="code">VARCHAR2(500)</td><td>לא</td><td></td><td>תיאור המערכת והשימוש בה.</td><td></td></tr>
+    <tr><td class="code">IS_ACTIVE</td><td class="code">CHAR(1)</td><td>כן</td><td>CHECK</td><td>האם המערכת פעילה.</td><td class="code">@allowed_values Y,N</td></tr>
+    <tr><td class="code">CREATED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td></td><td>מועד יצירת הרשומה.</td><td class="code">@default SYSTIMESTAMP</td></tr>
+    <tr><td class="code">UPDATED_AT</td><td class="code">TIMESTAMP</td><td>לא</td><td></td><td>מועד עדכון אחרון.</td><td></td></tr>
+  </tbody>
+</table>
+
+<!-- TABLE: NOTIF_MESSAGE_TEMPLATES -->
+<h3>6.4 NOTIF_MESSAGE_TEMPLATES</h3>
+
+<p>
+טבלת תבניות הודעה לוגיות. הטבלה אינה שומרת את גוף ההודעה לכל ערוץ, אלא את הזהות העסקית של התבנית.
+</p>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_MESSAGE_TEMPLATES
+@table_type: master
+@business_purpose: הגדרת תבניות הודעה לוגיות ללא תלות בערוץ.
+@expected_rows_after_1y: 100-1,000
+@expected_size_after_1y: &lt;100MB
+@partitioning_required: NO
+@retention_policy: שמירת תבניות פעילות והיסטוריות
+@source_of_truth: application-managed data
+@contains_lob: NO
+@contains_person_like_data: NO</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_MESSAGE_TEMPLATES IS
+'טבלת תבניות הודעה לוגיות. תוכן הודעה תלוי ערוץ נשמר בטבלת NOTIF_TEMPLATE_CHANNEL_CONTENTS.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">TEMPLATE_ID</td><td class="code">NUMBER</td><td>כן</td><td>PK</td><td>מזהה פנימי של תבנית לוגית.</td><td class="code">@generated_key YES</td></tr>
+    <tr><td class="code">TEMPLATE_CODE</td><td class="code">VARCHAR2(100)</td><td>כן</td><td>UK</td><td>קוד עסקי ייחודי של התבנית.</td><td class="code">@business_key YES</td></tr>
+    <tr><td class="code">TEMPLATE_NAME</td><td class="code">VARCHAR2(200)</td><td>כן</td><td></td><td>שם התבנית.</td><td></td></tr>
+    <tr><td class="code">DESCRIPTION</td><td class="code">VARCHAR2(1000)</td><td>לא</td><td></td><td>תיאור מטרת התבנית.</td><td></td></tr>
+    <tr><td class="code">IS_ACTIVE</td><td class="code">CHAR(1)</td><td>כן</td><td>CHECK</td><td>האם התבנית פעילה.</td><td class="code">@allowed_values Y,N</td></tr>
+    <tr><td class="code">CREATED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td></td><td>מועד יצירת הרשומה.</td><td class="code">@default SYSTIMESTAMP</td></tr>
+    <tr><td class="code">UPDATED_AT</td><td class="code">TIMESTAMP</td><td>לא</td><td></td><td>מועד עדכון אחרון.</td><td></td></tr>
+  </tbody>
+</table>
+
+<!-- TABLE: NOTIF_TEMPLATE_CHANNEL_CONTENTS -->
+<h3>6.5 NOTIF_TEMPLATE_CHANNEL_CONTENTS</h3>
+
+<p>
+טבלת תוכן תבנית לפי ערוץ. כל רשומה מגדירה את התוכן של תבנית לוגית בערוץ מסוים.
+</p>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_TEMPLATE_CHANNEL_CONTENTS
+@table_type: master_detail
+@business_purpose: שמירת תוכן הודעה תלוי ערוץ עבור תבנית לוגית.
+@expected_rows_after_1y: 500-5,000
+@expected_size_after_1y: 100MB-1GB
+@partitioning_required: NO
+@retention_policy: שמירת תוכן פעיל והיסטורי
+@source_of_truth: application-managed data
+@contains_lob: YES
+@contains_person_like_data: NO</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_TEMPLATE_CHANNEL_CONTENTS IS
+'טבלת תוכן הודעה לפי שילוב של תבנית לוגית וערוץ הפצה, כולל נושא, גוף, פורמט ותוכן ספק דמיוני.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">TEMPLATE_CHANNEL_CONTENT_ID</td><td class="code">NUMBER</td><td>כן</td><td>PK</td><td>מזהה פנימי של תוכן תבנית לערוץ.</td><td class="code">@generated_key YES</td></tr>
+    <tr><td class="code">TEMPLATE_ID</td><td class="code">NUMBER</td><td>כן</td><td>FK, UK חלקי</td><td>התבנית הלוגית שאליה שייך התוכן.</td><td></td></tr>
+    <tr><td class="code">CHANNEL_ID</td><td class="code">NUMBER</td><td>כן</td><td>FK, UK חלקי</td><td>הערוץ שעבורו מוגדר התוכן.</td><td></td></tr>
+    <tr><td class="code">CONTENT_FORMAT</td><td class="code">VARCHAR2(30)</td><td>כן</td><td></td><td>פורמט התוכן, למשל TEXT, HTML, MARKDOWN או JSON.</td><td class="code">@allowed_values TEXT,HTML,MARKDOWN,JSON</td></tr>
+    <tr><td class="code">SUBJECT_TEMPLATE</td><td class="code">VARCHAR2(500)</td><td>לא</td><td></td><td>תבנית נושא ההודעה, בעיקר לערוץ EMAIL.</td><td></td></tr>
+    <tr><td class="code">BODY_TEMPLATE</td><td class="code">CLOB</td><td>כן</td><td></td><td>גוף ההודעה עבור הערוץ.</td><td class="code">@lob YES</td></tr>
+    <tr><td class="code">SHORT_BODY_TEMPLATE</td><td class="code">VARCHAR2(1000)</td><td>לא</td><td></td><td>גוף מקוצר לערוצים קצרים.</td><td></td></tr>
+    <tr><td class="code">PROVIDER_PAYLOAD_TEMPLATE</td><td class="code">CLOB</td><td>לא</td><td></td><td>תבנית payload דמיונית לספק חיצוני עתידי.</td><td class="code">@lob YES</td></tr>
+    <tr><td class="code">IS_ACTIVE</td><td class="code">CHAR(1)</td><td>כן</td><td>CHECK</td><td>האם תוכן הערוץ פעיל.</td><td class="code">@allowed_values Y,N</td></tr>
+    <tr><td class="code">CREATED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td></td><td>מועד יצירת הרשומה.</td><td class="code">@default SYSTIMESTAMP</td></tr>
+    <tr><td class="code">UPDATED_AT</td><td class="code">TIMESTAMP</td><td>לא</td><td></td><td>מועד עדכון אחרון.</td><td></td></tr>
+  </tbody>
+</table>
+
+<h4>Constraints ואינדקסים</h4>
+<pre><code>PK: NOTIF_TEMPLATE_CHANNEL_CONTENTS_PK(TEMPLATE_CHANNEL_CONTENT_ID)
+UK: NOTIF_TEMPLATE_CHANNEL_CONTENTS_UK1(TEMPLATE_ID, CHANNEL_ID)
+FK: TEMPLATE_ID -> NOTIF_MESSAGE_TEMPLATES.TEMPLATE_ID
+FK: CHANNEL_ID -> NOTIF_CHANNELS.CHANNEL_ID</code></pre>
+
+<!-- TABLE: NOTIF_RECIPIENTS -->
+<h3>6.6 NOTIF_RECIPIENTS</h3>
+
+<p>
+טבלת נמענים מקומית. הנמען מגיע ממערכת חיצונית ונשמר מקומית אם עדיין אינו קיים לפי מערכת חיצונית ומזהה חיצוני.
+</p>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_RECIPIENTS
+@table_type: master
+@business_purpose: שמירת ייצוג מקומי של נמענים שמקורם במערכות חיצוניות.
+@expected_rows_after_1y: 300,000
+@expected_size_after_1y: 200MB-800MB
+@partitioning_required: NO
+@retention_policy: שמירה כל עוד קיים קישור להיסטוריית הפצה
+@source_of_truth: external system identity, locally cached
+@contains_lob: NO
+@contains_person_like_data: YES, נתונים דמיוניים בלבד</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_RECIPIENTS IS
+'טבלת נמענים מקומית. כל נמען מזוהה לפי מערכת חיצונית ומזהה נמען חיצוני.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">RECIPIENT_ID</td><td class="code">NUMBER</td><td>כן</td><td>PK</td><td>מזהה פנימי של הנמען.</td><td class="code">@generated_key YES</td></tr>
+    <tr><td class="code">EXTERNAL_SYSTEM_ID</td><td class="code">NUMBER</td><td>כן</td><td>FK, UK חלקי</td><td>המערכת החיצונית שממנה הגיע הנמען.</td><td></td></tr>
+    <tr><td class="code">EXTERNAL_RECIPIENT_ID</td><td class="code">VARCHAR2(200)</td><td>כן</td><td>UK חלקי</td><td>מזהה הנמען במערכת החיצונית.</td><td class="code">@external_identifier YES</td></tr>
+    <tr><td class="code">DISPLAY_NAME</td><td class="code">VARCHAR2(300)</td><td>לא</td><td></td><td>שם תצוגה דמיוני של הנמען.</td><td></td></tr>
+    <tr><td class="code">IS_ACTIVE</td><td class="code">CHAR(1)</td><td>כן</td><td>CHECK</td><td>האם הנמען פעיל.</td><td class="code">@allowed_values Y,N</td></tr>
+    <tr><td class="code">CREATED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td></td><td>מועד יצירת הרשומה.</td><td class="code">@default SYSTIMESTAMP</td></tr>
+    <tr><td class="code">UPDATED_AT</td><td class="code">TIMESTAMP</td><td>לא</td><td></td><td>מועד עדכון אחרון.</td><td></td></tr>
+  </tbody>
+</table>
+
+<h4>Constraints ואינדקסים</h4>
+<pre><code>PK: NOTIF_RECIPIENTS_PK(RECIPIENT_ID)
+UK: NOTIF_RECIPIENTS_UK1(EXTERNAL_SYSTEM_ID, EXTERNAL_RECIPIENT_ID)
+FK: EXTERNAL_SYSTEM_ID -> NOTIF_EXTERNAL_SYSTEMS.EXTERNAL_SYSTEM_ID</code></pre>
+
+<!-- TABLE: NOTIF_RECIPIENT_CHANNELS -->
+<h3>6.7 NOTIF_RECIPIENT_CHANNELS</h3>
+
+<p>
+טבלת יעדי שליחה לנמען לפי ערוץ. לדוגמה: כתובת מייל דמיונית, מספר טלפון דמיוני או chat id דמיוני.
+</p>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_RECIPIENT_CHANNELS
+@table_type: master_detail
+@business_purpose: שמירת יעדי שליחה לפי נמען וערוץ.
+@expected_rows_after_1y: 600,000-1,000,000
+@expected_size_after_1y: 500MB-1.5GB
+@partitioning_required: NO
+@retention_policy: שמירה כל עוד הנמען פעיל או מקושר להיסטוריה
+@source_of_truth: external system or controlled import
+@contains_lob: NO
+@contains_person_like_data: YES, נתונים דמיוניים בלבד</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_RECIPIENT_CHANNELS IS
+'טבלת יעדי שליחה לנמען לפי ערוץ, כגון כתובת מייל דמיונית, מספר טלפון דמיוני או מזהה צאט דמיוני.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">RECIPIENT_CHANNEL_ID</td><td class="code">NUMBER</td><td>כן</td><td>PK</td><td>מזהה פנימי של יעד שליחה לנמען.</td><td class="code">@generated_key YES</td></tr>
+    <tr><td class="code">RECIPIENT_ID</td><td class="code">NUMBER</td><td>כן</td><td>FK, UK חלקי</td><td>הנמען שאליו שייך יעד השליחה.</td><td></td></tr>
+    <tr><td class="code">CHANNEL_ID</td><td class="code">NUMBER</td><td>כן</td><td>FK, UK חלקי</td><td>ערוץ ההפצה של יעד השליחה.</td><td></td></tr>
+    <tr><td class="code">ADDRESS_VALUE</td><td class="code">VARCHAR2(500)</td><td>כן</td><td>UK חלקי</td><td>כתובת או מזהה יעד דמיוני לערוץ.</td><td class="code">@fictional_only YES</td></tr>
+    <tr><td class="code">IS_PRIMARY</td><td class="code">CHAR(1)</td><td>כן</td><td>CHECK</td><td>האם זה יעד ברירת המחדל לערוץ עבור הנמען.</td><td class="code">@allowed_values Y,N</td></tr>
+    <tr><td class="code">IS_ACTIVE</td><td class="code">CHAR(1)</td><td>כן</td><td>CHECK</td><td>האם יעד השליחה פעיל.</td><td class="code">@allowed_values Y,N</td></tr>
+    <tr><td class="code">CREATED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td></td><td>מועד יצירת הרשומה.</td><td class="code">@default SYSTIMESTAMP</td></tr>
+    <tr><td class="code">UPDATED_AT</td><td class="code">TIMESTAMP</td><td>לא</td><td></td><td>מועד עדכון אחרון.</td><td></td></tr>
+  </tbody>
+</table>
+
+<!-- TABLE: NOTIF_DISPATCH_REQUESTS -->
+<h3>6.8 NOTIF_DISPATCH_REQUESTS</h3>
+
+<p>
+טבלת בקשות הפצה. בקשה מייצגת אירוע עסקי שבו נדרשת הפצת הודעה.
+</p>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_DISPATCH_REQUESTS
+@table_type: transaction_header
+@business_purpose: שמירת בקשות הפצה ברמת header.
+@expected_rows_after_1y: 1,200,000
+@expected_size_after_1y: 1GB-2GB
+@partitioning_required: BORDERLINE
+@partitioning_decision: לבצע partitioning אם בדיקת sizing מצביעה על מעל 2GB בשנה
+@recommended_partition_key: REQUESTED_AT
+@recommended_partition_granularity: monthly
+@retention_policy: שמירה 12-24 חודשים לפחות</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_DISPATCH_REQUESTS IS
+'טבלת בקשות הפצה ברמת header. כל בקשה מייצגת דרישה עסקית להפצת הודעה או מסר.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">DISPATCH_REQUEST_ID</td><td class="code">NUMBER</td><td>כן</td><td>PK</td><td>מזהה פנימי של בקשת ההפצה.</td><td class="code">@generated_key YES</td></tr>
+    <tr><td class="code">TEMPLATE_ID</td><td class="code">NUMBER</td><td>לא</td><td>FK</td><td>תבנית הודעה לוגית, אם הבקשה מבוססת תבנית.</td><td></td></tr>
+    <tr><td class="code">REQUEST_STATUS_CODE</td><td class="code">VARCHAR2(30)</td><td>כן</td><td>FK, IDX</td><td>סטטוס בקשת ההפצה.</td><td></td></tr>
+    <tr><td class="code">REQUEST_TITLE</td><td class="code">VARCHAR2(300)</td><td>לא</td><td></td><td>כותרת או תיאור קצר של בקשת ההפצה.</td><td></td></tr>
+    <tr><td class="code">REQUESTED_BY</td><td class="code">VARCHAR2(100)</td><td>לא</td><td></td><td>גורם יוזם דמיוני.</td><td></td></tr>
+    <tr><td class="code">REQUESTED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td>IDX / Partition key אפשרי</td><td>מועד בקשת ההפצה.</td><td class="code">@time_key YES</td></tr>
+    <tr><td class="code">CREATED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td></td><td>מועד יצירת הרשומה.</td><td class="code">@default SYSTIMESTAMP</td></tr>
+    <tr><td class="code">UPDATED_AT</td><td class="code">TIMESTAMP</td><td>לא</td><td></td><td>מועד עדכון אחרון.</td><td></td></tr>
+  </tbody>
+</table>
+
+<!-- TABLE: NOTIF_DISPATCH_ITEMS -->
+<h3>6.9 NOTIF_DISPATCH_ITEMS</h3>
+
+<p>
+טבלת פריטי הפצה. כל רשומה מייצגת יחידת הפצה לוגית אחת: הודעה מסוימת לנמען מסוים בערוץ מסוים.
+</p>
+
+<div class="danger">
+  <strong>טבלה גדולה:</strong>
+  טבלה זו צפויה לעבור 2GB לאחר שנת שימוש ולכן נדרש partitioning.
+</div>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_DISPATCH_ITEMS
+@table_type: transaction_detail
+@business_purpose: שמירת פריטי הפצה ברמת נמען וערוץ.
+@expected_rows_after_1y: 60,000,000
+@expected_size_after_1y: 8GB-20GB
+@partitioning_required: YES
+@recommended_partition_key: CREATED_AT
+@recommended_partition_granularity: monthly
+@retention_policy: שמירה 12-24 חודשים לפחות, לאחר מכן ארכוב
+@high_growth_table: YES</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_DISPATCH_ITEMS IS
+'טבלת פריטי הפצה. כל פריט מייצג הודעה לנמען בערוץ מסוים, כולל סטטוס, קישור לנמען וקישור לתוכן שנשמר כ-snapshot.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">DISPATCH_ITEM_ID</td><td class="code">NUMBER</td><td>כן</td><td>PK</td><td>מזהה פנימי של פריט הפצה.</td><td class="code">@generated_key YES</td></tr>
+    <tr><td class="code">DISPATCH_REQUEST_ID</td><td class="code">NUMBER</td><td>כן</td><td>FK, IDX</td><td>בקשת ההפצה שאליה שייך הפריט.</td><td></td></tr>
+    <tr><td class="code">RECIPIENT_ID</td><td class="code">NUMBER</td><td>כן</td><td>FK, IDX</td><td>הנמען שאליו מיועד הפריט.</td><td></td></tr>
+    <tr><td class="code">RECIPIENT_CHANNEL_ID</td><td class="code">NUMBER</td><td>כן</td><td>FK</td><td>יעד השליחה של הנמען בערוץ.</td><td></td></tr>
+    <tr><td class="code">CHANNEL_ID</td><td class="code">NUMBER</td><td>כן</td><td>FK, IDX</td><td>ערוץ ההפצה של הפריט.</td><td></td></tr>
+    <tr><td class="code">TEMPLATE_CHANNEL_CONTENT_ID</td><td class="code">NUMBER</td><td>לא</td><td>FK</td><td>תוכן התבנית לפי ערוץ ששימש ליצירת הפריט.</td><td></td></tr>
+    <tr><td class="code">ITEM_STATUS_CODE</td><td class="code">VARCHAR2(30)</td><td>כן</td><td>FK, IDX</td><td>סטטוס פריט ההפצה.</td><td></td></tr>
+    <tr><td class="code">ATTEMPT_COUNT</td><td class="code">NUMBER</td><td>כן</td><td></td><td>מספר ניסיונות השליחה שנרשמו עבור הפריט.</td><td class="code">@default 0</td></tr>
+    <tr><td class="code">LAST_ATTEMPT_AT</td><td class="code">TIMESTAMP</td><td>לא</td><td>IDX</td><td>מועד ניסיון השליחה האחרון.</td><td></td></tr>
+    <tr><td class="code">CREATED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td>Partition key</td><td>מועד יצירת פריט ההפצה.</td><td class="code">@partition_key YES</td></tr>
+    <tr><td class="code">UPDATED_AT</td><td class="code">TIMESTAMP</td><td>לא</td><td></td><td>מועד עדכון אחרון.</td><td></td></tr>
+  </tbody>
+</table>
+
+<h4>אינדקסים מומלצים</h4>
+<pre><code>IDX: NOTIF_DISPATCH_ITEMS_IX1(DISPATCH_REQUEST_ID)
+IDX: NOTIF_DISPATCH_ITEMS_IX2(ITEM_STATUS_CODE, CREATED_AT)
+IDX: NOTIF_DISPATCH_ITEMS_IX3(RECIPIENT_ID, CREATED_AT)
+IDX: NOTIF_DISPATCH_ITEMS_IX4(CHANNEL_ID, CREATED_AT)</code></pre>
+
+<!-- TABLE: NOTIF_DISPATCH_ITEM_CONTENTS -->
+<h3>6.10 NOTIF_DISPATCH_ITEM_CONTENTS</h3>
+
+<p>
+טבלת snapshot של תוכן ההודעה ופרטי הנמען בזמן יצירת פריט ההפצה.
+הפרדה זו מונעת ניפוח נוסף של טבלת הפריטים הראשית ומאפשרת ניהול LOB בטבלה ייעודית.
+</p>
+
+<div class="danger">
+  <strong>טבלה גדולה מאוד:</strong>
+  טבלה זו צפויה לעבור 2GB לאחר שנת שימוש בגלל CLOB ולכן נדרש partitioning.
+</div>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_DISPATCH_ITEM_CONTENTS
+@table_type: transaction_snapshot
+@business_purpose: שמירת snapshot של תוכן ההודעה ופרטי הנמען בזמן יצירת פריט הפצה.
+@expected_rows_after_1y: 60,000,000
+@expected_size_after_1y: 20GB-80GB
+@partitioning_required: YES
+@recommended_partition_key: CREATED_AT
+@recommended_partition_granularity: monthly
+@contains_lob: YES
+@retention_policy: זהה ל-NOTIF_DISPATCH_ITEMS
+@high_growth_table: YES</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_DISPATCH_ITEM_CONTENTS IS
+'טבלת snapshot של תוכן הודעה ופרטי נמען כפי שהיו בזמן יצירת פריט ההפצה.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">DISPATCH_ITEM_ID</td><td class="code">NUMBER</td><td>כן</td><td>PK, FK</td><td>פריט ההפצה שאליו שייך ה-snapshot.</td><td></td></tr>
+    <tr><td class="code">RECIPIENT_DISPLAY_NAME_SNAPSHOT</td><td class="code">VARCHAR2(300)</td><td>לא</td><td></td><td>שם תצוגה של הנמען כפי שהיה בזמן יצירת הפריט.</td><td></td></tr>
+    <tr><td class="code">RECIPIENT_EXTERNAL_ID_SNAPSHOT</td><td class="code">VARCHAR2(200)</td><td>לא</td><td></td><td>מזהה חיצוני של הנמען בזמן יצירת הפריט.</td><td></td></tr>
+    <tr><td class="code">RECIPIENT_ADDRESS_SNAPSHOT</td><td class="code">VARCHAR2(500)</td><td>כן</td><td></td><td>כתובת או מזהה יעד לשליחה כפי שהיו בזמן יצירת הפריט.</td><td class="code">@fictional_only YES</td></tr>
+    <tr><td class="code">SUBJECT_SNAPSHOT</td><td class="code">VARCHAR2(500)</td><td>לא</td><td></td><td>נושא ההודעה כפי שנבחר עבור הערוץ.</td><td></td></tr>
+    <tr><td class="code">BODY_SNAPSHOT</td><td class="code">CLOB</td><td>כן</td><td></td><td>גוף ההודעה כפי שנבחר בזמן יצירת הפריט.</td><td class="code">@lob YES</td></tr>
+    <tr><td class="code">CONTENT_FORMAT_SNAPSHOT</td><td class="code">VARCHAR2(30)</td><td>כן</td><td></td><td>פורמט התוכן בזמן יצירת הפריט.</td><td></td></tr>
+    <tr><td class="code">CREATED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td>Partition key</td><td>מועד יצירת snapshot התוכן.</td><td class="code">@partition_key YES</td></tr>
+  </tbody>
+</table>
+
+<!-- TABLE: NOTIF_DELIVERY_ATTEMPTS -->
+<h3>6.11 NOTIF_DELIVERY_ATTEMPTS</h3>
+
+<p>
+טבלת ניסיונות שליחה דמיוניים. כל ניסיון שייך לפריט הפצה אחד.
+</p>
+
+<div class="danger">
+  <strong>טבלה גדולה:</strong>
+  טבלה זו צפויה לעבור 2GB לאחר שנת שימוש ולכן נדרש partitioning.
+</div>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_DELIVERY_ATTEMPTS
+@table_type: transaction_log
+@business_purpose: שמירת ניסיונות שליחה דמיוניים עבור פריטי הפצה.
+@expected_rows_after_1y: 72,000,000
+@expected_size_after_1y: 8GB-25GB
+@partitioning_required: YES
+@recommended_partition_key: STARTED_AT
+@recommended_partition_granularity: monthly
+@retention_policy: שמירה 12-24 חודשים לפחות, לאחר מכן ארכוב
+@high_growth_table: YES</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_DELIVERY_ATTEMPTS IS
+'טבלת ניסיונות שליחה דמיוניים עבור פריטי הפצה. אינה מייצגת שליחה אמיתית לספק חיצוני.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">DELIVERY_ATTEMPT_ID</td><td class="code">NUMBER</td><td>כן</td><td>PK</td><td>מזהה פנימי של ניסיון שליחה.</td><td class="code">@generated_key YES</td></tr>
+    <tr><td class="code">DISPATCH_ITEM_ID</td><td class="code">NUMBER</td><td>כן</td><td>FK, UK חלקי, IDX</td><td>פריט ההפצה שאליו שייך הניסיון.</td><td></td></tr>
+    <tr><td class="code">ATTEMPT_NUMBER</td><td class="code">NUMBER</td><td>כן</td><td>UK חלקי</td><td>מספר הניסיון עבור אותו פריט.</td><td></td></tr>
+    <tr><td class="code">ATTEMPT_STATUS_CODE</td><td class="code">VARCHAR2(30)</td><td>כן</td><td>FK, IDX</td><td>סטטוס ניסיון השליחה.</td><td></td></tr>
+    <tr><td class="code">STARTED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td>Partition key</td><td>מועד התחלת ניסיון השליחה.</td><td class="code">@partition_key YES</td></tr>
+    <tr><td class="code">FINISHED_AT</td><td class="code">TIMESTAMP</td><td>לא</td><td></td><td>מועד סיום ניסיון השליחה.</td><td></td></tr>
+    <tr><td class="code">RESULT_CODE</td><td class="code">VARCHAR2(100)</td><td>לא</td><td></td><td>קוד תוצאה דמיוני של ניסיון השליחה.</td><td></td></tr>
+    <tr><td class="code">RESULT_MESSAGE</td><td class="code">VARCHAR2(1000)</td><td>לא</td><td></td><td>הודעת תוצאה דמיונית.</td><td></td></tr>
+    <tr><td class="code">CREATED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td></td><td>מועד יצירת הרשומה.</td><td class="code">@default SYSTIMESTAMP</td></tr>
+  </tbody>
+</table>
+
+<!-- TABLE: NOTIF_PROVIDER_RESPONSES -->
+<h3>6.12 NOTIF_PROVIDER_RESPONSES</h3>
+
+<p>
+טבלת תגובות ספק דמיוניות. אינה שומרת תגובות מספק אמיתי.
+</p>
+
+<div class="danger">
+  <strong>טבלה גדולה:</strong>
+  טבלה זו צפויה לעבור 2GB לאחר שנת שימוש ולכן נדרש partitioning.
+</div>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_PROVIDER_RESPONSES
+@table_type: transaction_log
+@business_purpose: שמירת תגובות ספק דמיוניות לניסיונות שליחה.
+@expected_rows_after_1y: 72,000,000
+@expected_size_after_1y: 10GB-50GB
+@partitioning_required: YES
+@recommended_partition_key: RECEIVED_AT
+@recommended_partition_granularity: monthly
+@contains_lob: YES
+@retention_policy: שמירה 12-24 חודשים לפחות, לאחר מכן ארכוב
+@high_growth_table: YES</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_PROVIDER_RESPONSES IS
+'טבלת תגובות ספק דמיוניות עבור ניסיונות שליחה. אינה מכילה תגובות מספקים אמיתיים.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">PROVIDER_RESPONSE_ID</td><td class="code">NUMBER</td><td>כן</td><td>PK</td><td>מזהה פנימי של תגובת ספק.</td><td class="code">@generated_key YES</td></tr>
+    <tr><td class="code">DELIVERY_ATTEMPT_ID</td><td class="code">NUMBER</td><td>כן</td><td>FK, IDX</td><td>ניסיון השליחה שאליו שייכת התגובה.</td><td></td></tr>
+    <tr><td class="code">PROVIDER_CODE</td><td class="code">VARCHAR2(50)</td><td>לא</td><td>IDX</td><td>קוד ספק דמיוני.</td><td class="code">@fictional_only YES</td></tr>
+    <tr><td class="code">PROVIDER_MESSAGE_ID</td><td class="code">VARCHAR2(200)</td><td>לא</td><td></td><td>מזהה הודעה דמיוני אצל הספק.</td><td class="code">@fictional_only YES</td></tr>
+    <tr><td class="code">RESPONSE_CODE</td><td class="code">VARCHAR2(100)</td><td>לא</td><td></td><td>קוד תגובה דמיוני.</td><td></td></tr>
+    <tr><td class="code">RESPONSE_MESSAGE</td><td class="code">VARCHAR2(1000)</td><td>לא</td><td></td><td>הודעת תגובה דמיונית.</td><td></td></tr>
+    <tr><td class="code">RESPONSE_PAYLOAD</td><td class="code">CLOB</td><td>לא</td><td></td><td>Payload דמיוני של תגובת ספק.</td><td class="code">@lob YES</td></tr>
+    <tr><td class="code">RECEIVED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td>Partition key</td><td>מועד קבלת התגובה הדמיונית.</td><td class="code">@partition_key YES</td></tr>
+  </tbody>
+</table>
+
+<!-- TABLE: NOTIF_AUDIT_LOG -->
+<h3>6.13 NOTIF_AUDIT_LOG</h3>
+
+<p>
+טבלת audit לאירועים משמעותיים במערכת. ניתן לדחות מימוש לאיטרציה מאוחרת, אך מבחינת המודל היא קיימת כטבלה עתידית.
+</p>
+
+<div class="danger">
+  <strong>טבלה גדולה:</strong>
+  טבלה זו צפויה לעבור 2GB לאחר שנת שימוש ולכן נדרש partitioning אם תמומש.
+</div>
+
+<h4>Annotations</h4>
+<pre><code>@table_name: NOTIF_AUDIT_LOG
+@table_type: audit_log
+@business_purpose: שמירת אירועי audit משמעותיים במערכת ההודעות.
+@expected_rows_after_1y: 100,000,000+
+@expected_size_after_1y: 20GB-100GB
+@partitioning_required: YES
+@recommended_partition_key: CREATED_AT
+@recommended_partition_granularity: monthly
+@contains_lob: YES
+@retention_policy: לפי החלטת retention עתידית
+@high_growth_table: YES</code></pre>
+
+<h4>SQL table comment</h4>
+<pre><code>COMMENT ON TABLE AI_APP_OWNER.NOTIF_AUDIT_LOG IS
+'טבלת audit לאירועים משמעותיים במערכת הפצת ההודעות, כגון יצירה, שינוי סטטוס, ניסיונות שליחה ושגיאות דמיוניות.';</code></pre>
+
+<h4>עמודות</h4>
+<table>
+  <thead><tr><th>עמודה</th><th>סוג מוצע</th><th>חובה</th><th>מפתח/אינדקס</th><th>Column comment</th><th>Annotations</th></tr></thead>
+  <tbody>
+    <tr><td class="code">AUDIT_LOG_ID</td><td class="code">NUMBER</td><td>כן</td><td>PK</td><td>מזהה פנימי של אירוע audit.</td><td class="code">@generated_key YES</td></tr>
+    <tr><td class="code">ENTITY_NAME</td><td class="code">VARCHAR2(100)</td><td>כן</td><td>IDX</td><td>שם הישות שעליה בוצעה הפעולה.</td><td></td></tr>
+    <tr><td class="code">ENTITY_ID</td><td class="code">NUMBER</td><td>לא</td><td>IDX</td><td>מזהה הישות שעליה בוצעה הפעולה.</td><td></td></tr>
+    <tr><td class="code">ACTION_CODE</td><td class="code">VARCHAR2(50)</td><td>כן</td><td>IDX</td><td>קוד פעולה, למשל CREATE, UPDATE_STATUS או CREATE_ATTEMPT.</td><td></td></tr>
+    <tr><td class="code">OLD_STATUS_CODE</td><td class="code">VARCHAR2(30)</td><td>לא</td><td></td><td>סטטוס קודם, אם רלוונטי.</td><td></td></tr>
+    <tr><td class="code">NEW_STATUS_CODE</td><td class="code">VARCHAR2(30)</td><td>לא</td><td></td><td>סטטוס חדש, אם רלוונטי.</td><td></td></tr>
+    <tr><td class="code">ACTION_DETAILS</td><td class="code">CLOB</td><td>לא</td><td></td><td>פרטי פעולה דמיוניים או טכניים.</td><td class="code">@lob YES</td></tr>
+    <tr><td class="code">CREATED_BY</td><td class="code">VARCHAR2(100)</td><td>לא</td><td></td><td>גורם יוצר דמיוני.</td><td></td></tr>
+    <tr><td class="code">CREATED_AT</td><td class="code">TIMESTAMP</td><td>כן</td><td>Partition key</td><td>מועד יצירת אירוע audit.</td><td class="code">@partition_key YES</td></tr>
+  </tbody>
+</table>
+
+<h2>7. טבלאות שמחייבות Partitioning</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>טבלה</th>
+      <th>סיבה</th>
+      <th>מפתח Partition מומלץ</th>
+      <th>גרעיניות</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td class="code">NOTIF_DISPATCH_ITEMS</td><td>60 מיליון רשומות בשנה</td><td class="code">CREATED_AT</td><td>חודשי</td></tr>
+    <tr><td class="code">NOTIF_DISPATCH_ITEM_CONTENTS</td><td>60 מיליון רשומות + CLOB</td><td class="code">CREATED_AT</td><td>חודשי</td></tr>
+    <tr><td class="code">NOTIF_DELIVERY_ATTEMPTS</td><td>72 מיליון רשומות בשנה</td><td class="code">STARTED_AT</td><td>חודשי</td></tr>
+    <tr><td class="code">NOTIF_PROVIDER_RESPONSES</td><td>72 מיליון רשומות + CLOB</td><td class="code">RECEIVED_AT</td><td>חודשי</td></tr>
+    <tr><td class="code">NOTIF_AUDIT_LOG</td><td>100 מיליון רשומות ומעלה + CLOB</td><td class="code">CREATED_AT</td><td>חודשי</td></tr>
+  </tbody>
+</table>
+
+<h2>8. הערות ל-Codex לפני יצירת DDL</h2>
+
+<div class="warning">
+  <p>
+    אין לתת ל-Codex "להמציא" מודל נתונים. Codex צריך לקבל את האפיון הזה כמקור דרישות ולייצר DDL בהתאם.
+  </p>
+</div>
+
+<p>
+כאשר תינתן משימת DDL ל-Codex, עליו לייצר:
+</p>
+
+<ul>
+  <li>קובצי SQL ליצירת כל הטבלאות.</li>
+  <li>Comments לכל טבלה.</li>
+  <li>Comments לכל עמודה.</li>
+  <li>Constraints מלאים.</li>
+  <li>Indexes לפי האפיון.</li>
+  <li>Partitioning לטבלאות שמסומנות כ-<code>partitioning_required: YES</code>.</li>
+  <li>קובצי seed לטבלאות reference.</li>
+  <li>בדיקות object inventory.</li>
+  <li>בדיקות invalid objects.</li>
+  <li>מטריצת הצלבה בין דרישות, טבלאות, עמודות, constraints ובדיקות.</li>
+</ul>
+
+<h2>9. שאלות פתוחות להמשך</h2>
+
+<ol>
+  <li>האם להחליף את הסכמה <code>AI_APP_OWNER</code> ל-<code>NOTIF_APP_OWNER</code> לפני יצירת DDL?</li>
+  <li>האם לשנות את שמות Docker resources לשם הפרויקט החדש?</li>
+  <li>האם <code>NOTIF_AUDIT_LOG</code> נכללת באיטרציה הראשונה או מוגדרת לטיפול עתידי בלבד?</li>
+  <li>האם <code>NOTIF_DISPATCH_REQUESTS</code> תקבל partitioning כברירת מחדל בגלל שהיא גבולית?</li>
+  <li>האם נדרש לשמור payload דמיוני מלא כ-CLOB, או רק קוד ותיאור תגובה?</li>
+  <li>האם כל תבנית חייבת תוכן לכל ערוץ פעיל, או רק לערוצים שבהם היא נתמכת?</li>
+  <li>האם נדרש מנגנון versioning לתבניות הודעה מעבר ל-snapshot בפריטי ההפצה?</li>
+</ol>
+
+</main>
+</body>
+</html>

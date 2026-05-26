@@ -61,9 +61,9 @@ run_local_tests() {
   verbosity="$(verbose_flag)"
 
   if [[ -n "$verbosity" ]]; then
-    python -m unittest discover -s tests -p "test_*.py" "$verbosity"
+    ${PYTHON_BIN:-python3} -m unittest discover -s tests -p "test_*.py" "$verbosity"
   else
-    python -m unittest discover -s tests -p "test_*.py"
+    ${PYTHON_BIN:-python3} -m unittest discover -s tests -p "test_*.py"
   fi
 
   if [[ "$MODE" == "full" ]]; then

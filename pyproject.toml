@@ -1,6 +1,6 @@
 [project]
-name = "oracle-dev-ai-lab"
-description = "DEVELOPMENT in Oracle using AI Lab - Oracle AI Lab repository with retained Python starter tooling"
+name = "oracle-notification-dispatch-lab"
+description = "Oracle Notification Dispatch Lab - Oracle database layer lab for a fictional notification dispatch system"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [

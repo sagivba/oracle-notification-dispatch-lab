@@ -3,9 +3,9 @@
 # Related decisions: DEC-003, DEC-004, DEC-006, DEC-019.
 set -euo pipefail
 
-CONTAINER_NAME="oracle-dev-ai-lab-db"
-VOLUME_NAME="oracle-dev-ai-lab-u01"
-BACKUP_ROOT="${BACKUP_ROOT:-backups/oracle-dev-ai-lab}"
+CONTAINER_NAME="oracle-notification-dispatch-lab-db"
+VOLUME_NAME="oracle-notification-dispatch-lab-u01"
+BACKUP_ROOT="${BACKUP_ROOT:-backups/oracle-notification-dispatch-lab}"
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 BACKUP_DIR="${BACKUP_ROOT}/${TIMESTAMP}"
 WAS_RUNNING="false"
@@ -28,7 +28,7 @@ docker inspect --format '{{.Config.Image}}' "${CONTAINER_NAME}" > "${BACKUP_DIR}
 cat > "${BACKUP_DIR}/runtime.txt" <<EOF
 container=${CONTAINER_NAME}
 volume=${VOLUME_NAME}
-network=oracle-dev-ai-lab-net
+network=oracle-notification-dispatch-lab-net
 oradata_mount=/opt/oracle/oradata
 listener_port=1521
 pdb=FREEPDB1

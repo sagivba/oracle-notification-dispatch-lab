@@ -128,7 +128,7 @@ class TestRepositoryContract(unittest.TestCase):
         for relative_path in checked_files:
             with self.subTest(path=relative_path):
                 content = (ROOT / relative_path).read_text(encoding="utf-8")
-                self.assertIn("AI_APP_OWNER", content)
+                self.assertIn("NOTIF_APP_OWNER", content)
 
     def test_scripts_target_current_local_lab_container(self) -> None:
         checked_files = [
@@ -145,7 +145,7 @@ class TestRepositoryContract(unittest.TestCase):
         for relative_path in checked_files:
             with self.subTest(path=relative_path):
                 content = (ROOT / relative_path).read_text(encoding="utf-8")
-                self.assertIn("oracle-dev-ai-lab-db", content)
+                self.assertIn("oracle-notification-dispatch-lab-db", content)
 
     def test_no_obvious_example_secrets_in_managed_files(self) -> None:
         checked_files = [

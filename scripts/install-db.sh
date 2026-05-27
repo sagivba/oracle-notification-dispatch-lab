@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Purpose: Official shell entry point for the controlled local DB install.
-# It targets only the local oracle-dev-ai-lab-db container and runs the managed
+# It targets only the local oracle-notification-dispatch-lab-db container and runs the managed
 # SQL entry point db/install/install.sql. It does not contain inline DDL or DML.
 
 set -euo pipefail
@@ -8,10 +8,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-CONTAINER_NAME="oracle-dev-ai-lab-db"
+CONTAINER_NAME="oracle-notification-dispatch-lab-db"
 ORACLE_PDB="${ORACLE_PDB:-FREEPDB1}"
 DB_SOURCE_DIR="${REPO_ROOT}/db"
-REMOTE_DB_DIR="/tmp/oracle-dev-ai-lab-db"
+REMOTE_DB_DIR="/tmp/oracle-notification-dispatch-lab-db"
 
 fail() {
   printf 'ERROR: %s\n' "$1" >&2
@@ -42,7 +42,7 @@ load_dotenv_if_present() {
     value="${value#\'}"
 
     case "$key" in
-      ORACLE_PWD|ORACLE_PDB|AI_APP_OWNER_PWD|AI_APP_RUNTIME_PWD|AI_APP_READONLY_PWD|AI_REVIEWER_PWD)
+      ORACLE_PWD|ORACLE_PDB|NOTIF_APP_OWNER_PWD|AI_APP_RUNTIME_PWD|AI_APP_READONLY_PWD|AI_REVIEWER_PWD)
         if [[ -z "${!key:-}" ]]; then
           printf -v "$key" '%s' "$value"
           export "$key"
@@ -63,12 +63,12 @@ require_secret_var() {
 load_dotenv_if_present
 
 require_secret_var "ORACLE_PWD"
-require_secret_var "AI_APP_OWNER_PWD"
+require_secret_var "NOTIF_APP_OWNER_PWD"
 require_secret_var "AI_APP_RUNTIME_PWD"
 require_secret_var "AI_APP_READONLY_PWD"
 require_secret_var "AI_REVIEWER_PWD"
 
-[[ "$CONTAINER_NAME" == "oracle-dev-ai-lab-db" ]] || fail "Install target must remain oracle-dev-ai-lab-db."
+[[ "$CONTAINER_NAME" == "oracle-notification-dispatch-lab-db" ]] || fail "Install target must remain oracle-notification-dispatch-lab-db."
 [[ -n "$ORACLE_PDB" ]] || fail "ORACLE_PDB must not be empty."
 [[ -f "${DB_SOURCE_DIR}/install/install.sql" ]] || fail "Missing official SQL entry point: db/install/install.sql."
 
@@ -85,7 +85,7 @@ set +e
 install_output="$(docker exec -i "$CONTAINER_NAME" sqlplus -L -S \
   "sys/${ORACLE_PWD}@localhost:1521/${ORACLE_PDB} as sysdba" \
   @"${REMOTE_DB_DIR}/install/install.sql" \
-  "$AI_APP_OWNER_PWD" \
+  "$NOTIF_APP_OWNER_PWD" \
   "$AI_APP_RUNTIME_PWD" \
   "$AI_APP_READONLY_PWD" \
   "$AI_REVIEWER_PWD" \

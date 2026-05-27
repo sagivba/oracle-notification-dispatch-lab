@@ -13,7 +13,7 @@ prompt Controlled install workflow with infrastructure smoke object
 
 -- Password values are supplied by scripts/install-db.sh from local environment
 -- variables. The values must never be committed to Git.
-define AI_APP_OWNER_PWD = "&1"
+define NOTIF_APP_OWNER_PWD = "&1"
 define AI_APP_RUNTIME_PWD = "&2"
 define AI_APP_READONLY_PWD = "&3"
 define AI_REVIEWER_PWD = "&4"

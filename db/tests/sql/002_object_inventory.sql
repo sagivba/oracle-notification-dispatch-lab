@@ -16,18 +16,18 @@ begin
   select count(*)
     into l_table_count
     from all_objects
-   where owner = 'AI_APP_OWNER'
+   where owner = 'NOTIF_APP_OWNER'
      and object_name = 'LAB_SMOKE_TEST'
      and object_type = 'TABLE';
 
   if l_table_count != 1 then
-    raise_application_error(-20001, 'Expected table AI_APP_OWNER.LAB_SMOKE_TEST was not found.');
+    raise_application_error(-20001, 'Expected table NOTIF_APP_OWNER.LAB_SMOKE_TEST was not found.');
   end if;
 
   select count(*)
     into l_column_count
     from all_tab_columns
-   where owner = 'AI_APP_OWNER'
+   where owner = 'NOTIF_APP_OWNER'
      and table_name = 'LAB_SMOKE_TEST'
      and (
        (column_name = 'ID' and data_type = 'NUMBER')

@@ -27,7 +27,7 @@ begin
   l_username := upper(p_username);
 
   if l_username not in (
-    'AI_APP_OWNER',
+    'NOTIF_APP_OWNER',
     'AI_APP_RUNTIME',
     'AI_APP_READONLY',
     'AI_REVIEWER'
@@ -75,15 +75,15 @@ end;
 /
 
 begin
-  ORACLE_AI_LAB_ENSURE_USER('AI_APP_OWNER', q'[&&AI_APP_OWNER_PWD]', 'Y');
+  ORACLE_AI_LAB_ENSURE_USER('NOTIF_APP_OWNER', q'[&&NOTIF_APP_OWNER_PWD]', 'Y');
   ORACLE_AI_LAB_ENSURE_USER('AI_APP_RUNTIME', q'[&&AI_APP_RUNTIME_PWD]', 'N');
   ORACLE_AI_LAB_ENSURE_USER('AI_APP_READONLY', q'[&&AI_APP_READONLY_PWD]', 'N');
   ORACLE_AI_LAB_ENSURE_USER('AI_REVIEWER', q'[&&AI_REVIEWER_PWD]', 'N');
 end;
 /
 
-grant create session to AI_APP_OWNER;
-grant create table to AI_APP_OWNER;
+grant create session to NOTIF_APP_OWNER;
+grant create table to NOTIF_APP_OWNER;
 
 grant create session to AI_APP_RUNTIME;
 grant create session to AI_APP_READONLY;

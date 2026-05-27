@@ -42,7 +42,7 @@ load_dotenv_if_present() {
     value="${value#\'}"
 
     case "$key" in
-      ORACLE_PWD|ORACLE_PDB|AI_APP_OWNER_PWD|AI_APP_RUNTIME_PWD|AI_APP_READONLY_PWD|AI_REVIEWER_PWD)
+      ORACLE_PWD|ORACLE_PDB|NOTIF_APP_OWNER_PWD|AI_APP_RUNTIME_PWD|AI_APP_READONLY_PWD|AI_REVIEWER_PWD)
         if [[ -z "${!key:-}" ]]; then
           printf -v "$key" '%s' "$value"
           export "$key"
@@ -63,7 +63,7 @@ require_secret_var() {
 load_dotenv_if_present
 
 require_secret_var "ORACLE_PWD"
-require_secret_var "AI_APP_OWNER_PWD"
+require_secret_var "NOTIF_APP_OWNER_PWD"
 require_secret_var "AI_APP_RUNTIME_PWD"
 require_secret_var "AI_APP_READONLY_PWD"
 require_secret_var "AI_REVIEWER_PWD"
@@ -85,7 +85,7 @@ set +e
 install_output="$(docker exec -i "$CONTAINER_NAME" sqlplus -L -S \
   "sys/${ORACLE_PWD}@localhost:1521/${ORACLE_PDB} as sysdba" \
   @"${REMOTE_DB_DIR}/install/install.sql" \
-  "$AI_APP_OWNER_PWD" \
+  "$NOTIF_APP_OWNER_PWD" \
   "$AI_APP_RUNTIME_PWD" \
   "$AI_APP_READONLY_PWD" \
   "$AI_REVIEWER_PWD" \

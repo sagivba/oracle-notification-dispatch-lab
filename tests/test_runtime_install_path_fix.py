@@ -14,7 +14,7 @@ class TestRuntimeInstallPathFix(unittest.TestCase):
         env_example = (ROOT / ".env.example").read_text(encoding="utf-8")
 
         for variable_name in [
-            "AI_APP_OWNER_PWD",
+            "NOTIF_APP_OWNER_PWD",
             "AI_APP_RUNTIME_PWD",
             "AI_APP_READONLY_PWD",
             "AI_REVIEWER_PWD",

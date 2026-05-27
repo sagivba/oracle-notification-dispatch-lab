@@ -128,7 +128,7 @@ class TestRepositoryContract(unittest.TestCase):
         for relative_path in checked_files:
             with self.subTest(path=relative_path):
                 content = (ROOT / relative_path).read_text(encoding="utf-8")
-                self.assertIn("AI_APP_OWNER", content)
+                self.assertIn("NOTIF_APP_OWNER", content)
 
     def test_scripts_target_current_local_lab_container(self) -> None:
         checked_files = [

@@ -3,7 +3,7 @@
 # Related decisions: DEC-005, DEC-006, DEC-007, DEC-008, DEC-009.
 set -euo pipefail
 
-CONTAINER_NAME="oracle-dev-ai-lab-db"
+CONTAINER_NAME="oracle-notification-dispatch-lab-db"
 READY_MESSAGE="DATABASE IS READY TO USE!"
 
 fail() {

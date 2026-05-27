@@ -3,9 +3,9 @@
 # Related decisions: DEC-004, DEC-005, DEC-006, DEC-007.
 set -euo pipefail
 
-CONTAINER_NAME="oracle-dev-ai-lab-db"
-VOLUME_NAME="oracle-dev-ai-lab-u01"
-NETWORK_NAME="oracle-dev-ai-lab-net"
+CONTAINER_NAME="oracle-notification-dispatch-lab-db"
+VOLUME_NAME="oracle-notification-dispatch-lab-u01"
+NETWORK_NAME="oracle-notification-dispatch-lab-net"
 
 confirm="${1:-}"
 

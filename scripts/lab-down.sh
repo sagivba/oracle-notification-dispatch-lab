@@ -3,7 +3,7 @@
 # Related decisions: DEC-004, DEC-005, DEC-006.
 set -euo pipefail
 
-CONTAINER_NAME="oracle-dev-ai-lab-db"
+CONTAINER_NAME="oracle-notification-dispatch-lab-db"
 
 if docker ps -a --format '{{.Names}}' | grep -Fxq "${CONTAINER_NAME}"; then
   echo "Stopping ${CONTAINER_NAME}. The Docker volume remains intact."

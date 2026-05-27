@@ -14,20 +14,20 @@ services:
 
   db:
     image: ${ORACLE_IMAGE:-container-registry.oracle.com/database/free:latest}
-    container_name: oracle-dev-ai-lab-db
+    container_name: oracle-notification-dispatch-lab-db
     environment:
       ORACLE_PWD: ${ORACLE_PWD:?Set ORACLE_PWD in local .env before starting the lab}
     ports:
       - "${ORACLE_HOST_PORT:-1521}:1521"
     volumes:
-      - oracle-dev-ai-lab-u01:/opt/oracle/oradata
+      - oracle-notification-dispatch-lab-u01:/opt/oracle/oradata
     networks:
-      - oracle-dev-ai-lab-net
+      - oracle-notification-dispatch-lab-net
 
 volumes:
-  oracle-dev-ai-lab-u01:
-    name: oracle-dev-ai-lab-u01
+  oracle-notification-dispatch-lab-u01:
+    name: oracle-notification-dispatch-lab-u01
 
 networks:
-  oracle-dev-ai-lab-net:
-    name: oracle-dev-ai-lab-net
+  oracle-notification-dispatch-lab-net:
+    name: oracle-notification-dispatch-lab-net

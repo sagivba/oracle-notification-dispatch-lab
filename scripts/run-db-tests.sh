@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 # Purpose: Official shell entry point for local Oracle SQL smoke tests.
 # It runs only managed SQL files under db/tests/sql against the local
-# oracle-dev-ai-lab-db container and does not contain inline DDL or DML.
+# oracle-notification-dispatch-lab-db container and does not contain inline DDL or DML.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-CONTAINER_NAME="oracle-dev-ai-lab-db"
+CONTAINER_NAME="oracle-notification-dispatch-lab-db"
 ORACLE_PDB="${ORACLE_PDB:-FREEPDB1}"
 SQL_TEST_DIR="${REPO_ROOT}/db/tests/sql"
-REMOTE_SQL_TEST_DIR="/tmp/oracle-dev-ai-lab-sql-tests"
+REMOTE_SQL_TEST_DIR="/tmp/oracle-notification-dispatch-lab-sql-tests"
 
 fail() {
   printf 'ERROR: %s\n' "$1" >&2
@@ -58,7 +58,7 @@ load_dotenv_if_present
 
 require_secret_var "ORACLE_PWD"
 
-[[ "$CONTAINER_NAME" == "oracle-dev-ai-lab-db" ]] || fail "DB test target must remain oracle-dev-ai-lab-db."
+[[ "$CONTAINER_NAME" == "oracle-notification-dispatch-lab-db" ]] || fail "DB test target must remain oracle-notification-dispatch-lab-db."
 [[ -n "$ORACLE_PDB" ]] || fail "ORACLE_PDB must not be empty."
 [[ -d "$SQL_TEST_DIR" ]] || fail "Missing SQL test directory: db/tests/sql."
 

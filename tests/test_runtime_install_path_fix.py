@@ -1,4 +1,4 @@
-# Purpose: unittest coverage for the pre-Goal-011 runtime install path fix.
+# Purpose: unittest coverage for the current runtime install path contract.
 
 import subprocess
 import unittest
@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class TestRuntimeInstallPathFix(unittest.TestCase):
-    """Validate the focused runtime install fix without connecting to Oracle."""
+    """Validate the focused runtime install contract without connecting to Oracle."""
 
     def test_env_example_lists_required_local_password_placeholders(self) -> None:
         env_example = (ROOT / ".env.example").read_text(encoding="utf-8")
@@ -28,7 +28,7 @@ class TestRuntimeInstallPathFix(unittest.TestCase):
     def test_env_example_project_name_is_bash_source_safe(self) -> None:
         env_example = (ROOT / ".env.example").read_text(encoding="utf-8")
 
-        self.assertIn('PROJECT_NAME="DEVELOPMENT in Oracle using AI Lab"', env_example)
+        self.assertIn('PROJECT_NAME="Oracle Notification Dispatch Lab"', env_example)
 
         completed = subprocess.run(
             [
@@ -42,7 +42,7 @@ class TestRuntimeInstallPathFix(unittest.TestCase):
             capture_output=True,
         )
 
-        self.assertEqual("DEVELOPMENT in Oracle using AI Lab", completed.stdout)
+        self.assertEqual("Oracle Notification Dispatch Lab", completed.stdout)
 
     def test_install_sql_terminates_sqlplus(self) -> None:
         install_sql_lines = [

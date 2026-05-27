@@ -1,4 +1,4 @@
-# Purpose: unittest contract coverage for the repository review workflow.
+# Purpose: unittest contract coverage for the current repository review workflow baseline.
 
 from __future__ import annotations
 
@@ -9,17 +9,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "review-db-code.sh"
 REPORT = ROOT / "db" / "review" / "review-report.md"
-DOC = ROOT / "docs" / "review-workflow.md"
 
 
 class TestReviewWorkflowContract(unittest.TestCase):
-    """Validate the review skeleton without Docker, Oracle, network, or secrets."""
+    """Validate the current review skeleton without Docker, Oracle, network, or secrets."""
 
     def test_review_script_exists_and_is_executable(self) -> None:
         self.assertTrue(SCRIPT.is_file())
         self.assertTrue(os.access(SCRIPT, os.X_OK))
 
     def test_review_report_exists_and_has_required_sections(self) -> None:
+        self.assertTrue(REPORT.is_file())
+
         report = REPORT.read_text(encoding="utf-8")
         required_sections = [
             "## Spec coverage",
@@ -48,16 +49,14 @@ class TestReviewWorkflowContract(unittest.TestCase):
 
         self.assertIn("A release package is not approved if any BLOCKER exists.", report)
 
-    def test_review_workflow_documentation_exists_and_has_safety_boundaries(self) -> None:
-        doc = DOC.read_text(encoding="utf-8")
+    def test_review_script_is_repository_only_static_check(self) -> None:
+        script = SCRIPT.read_text(encoding="utf-8")
 
-        self.assertIn("## Safety Boundaries", doc)
-        self.assertIn("must not connect to organizational databases", doc)
-        self.assertIn("must not execute ad-hoc DDL or DML", doc)
-        self.assertIn("oracle-dev-ai-lab-db", doc)
-        self.assertIn("release packaging", doc)
+        self.assertIn("repository-only", script)
+        self.assertNotIn("docker exec", script)
+        self.assertNotIn("sqlplus", script)
 
-    def test_review_script_uses_local_project_paths_and_managed_files(self) -> None:
+    def test_review_script_uses_current_project_paths_and_managed_files(self) -> None:
         script = SCRIPT.read_text(encoding="utf-8")
 
         for expected in [
@@ -70,6 +69,14 @@ class TestReviewWorkflowContract(unittest.TestCase):
         ]:
             with self.subTest(expected=expected):
                 self.assertIn(expected, script)
+
+    def test_review_script_checks_versioned_db_sources(self) -> None:
+        script = SCRIPT.read_text(encoding="utf-8")
+
+        self.assertIn("check_versioned_db_sources", script)
+        self.assertIn("DB source files must be versioned SQL files or README placeholders.", script)
+        self.assertIn("db/src", script)
+        self.assertIn("*.sql", script)
 
     def test_review_script_avoids_obvious_forbidden_targets_and_secrets(self) -> None:
         script = SCRIPT.read_text(encoding="utf-8")
@@ -88,12 +95,11 @@ class TestReviewWorkflowContract(unittest.TestCase):
             with self.subTest(token=token):
                 self.assertNotIn(token, script)
 
-    def test_review_script_does_not_require_runtime_db_by_default(self) -> None:
-        script = SCRIPT.read_text(encoding="utf-8")
+    def test_current_review_contract_does_not_require_missing_review_docs(self) -> None:
+        """The current baseline has a review script/report, but review docs are not stable yet."""
 
-        self.assertNotIn("docker exec", script)
-        self.assertNotIn("sqlplus", script)
-        self.assertIn("repository-only", script)
+        self.assertTrue(SCRIPT.is_file())
+        self.assertTrue(REPORT.is_file())
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Purpose: Release packaging workflow entry point for Oracle AI Lab.
+# Purpose: Release packaging workflow entry point for Oracle Notification Dispatch Lab.
 # It runs the repository-local Python packaging helper only; it does not connect
 # to Oracle, run Docker, access organizational databases, or execute DDL/DML.
 

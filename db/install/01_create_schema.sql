@@ -1,4 +1,4 @@
--- Purpose: Managed schema-level setup placeholder for the Oracle AI Lab.
+-- Purpose: Managed schema-level setup placeholder for Oracle Notification Dispatch Lab.
 -- This file reserves the managed install location for schema setup while keeping
 -- business functionality out of the Infrastructure MVP.
 
@@ -7,7 +7,7 @@ set feedback on
 set heading on
 set verify off
 
-prompt Preparing Oracle AI Lab schema setup skeleton.
+prompt Preparing Oracle Notification Dispatch Lab schema setup skeleton.
 
 -- The Infrastructure MVP creates no business tables, packages, views, triggers,
 -- seed data, or release-management implementation. This preserves DEC-013 and

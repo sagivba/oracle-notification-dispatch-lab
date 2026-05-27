@@ -100,10 +100,16 @@ Python tests use `unittest`.
 
 Do not introduce `pytest` for this project unless this decision is explicitly changed.
 
-## Open questions
+### DEC-013: Runtime, read-only, and reviewer schemas
 
-### OQ-001: Legacy schema names
+The runtime, read-only, and reviewer schemas use notification-specific names.
 
-The repository still contains legacy role or schema names `AI_APP_RUNTIME`, `AI_APP_READONLY`, and `AI_REVIEWER`.
+Current schema names:
+- `NOTIF_APP_RUNTIME`
+- `NOTIF_APP_READONLY`
+- `NOTIF_REVIEWER`
 
-It is not yet decided whether these names should later be renamed to match the notification dispatch project naming scheme.
+Current local password placeholders:
+- `NOTIF_APP_RUNTIME_PWD`
+- `NOTIF_APP_READONLY_PWD`
+- `NOTIF_REVIEWER_PWD`

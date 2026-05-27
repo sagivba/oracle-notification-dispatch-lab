@@ -112,9 +112,9 @@ class TestRepositoryContract(unittest.TestCase):
 
         self.assertIn("@@00_create_lab_users.sql", install_sql)
         self.assertIn("@@01_create_schema.sql", install_sql)
-        self.assertIn('define ORACLE_AI_LAB_DB_ROOT = "&5"', install_sql)
+        self.assertIn('define NOTIF_LAB_DB_ROOT = "&5"', install_sql)
         self.assertIn(
-            "@@&&ORACLE_AI_LAB_DB_ROOT/src/tables/lab_smoke_test.sql",
+            "@@&&NOTIF_LAB_DB_ROOT/src/tables/lab_smoke_test.sql",
             install_sql,
         )
         self.assertEqual("exit success", install_sql.strip().splitlines()[-1].lower())
@@ -205,9 +205,9 @@ class TestRepositoryContract(unittest.TestCase):
             "NOTIF_DISPATCH_REQUESTS",
             "CLOB",
             "unittest",
-            "AI_APP_RUNTIME",
-            "AI_APP_READONLY",
-            "AI_REVIEWER",
+            "NOTIF_APP_RUNTIME",
+            "NOTIF_APP_READONLY",
+            "NOTIF_REVIEWER",
         ]:
             with self.subTest(expected=expected):
                 self.assertIn(expected, decision_log)

@@ -42,7 +42,7 @@ load_dotenv_if_present() {
     value="${value#\'}"
 
     case "$key" in
-      ORACLE_PWD|ORACLE_PDB|NOTIF_APP_OWNER_PWD|AI_APP_RUNTIME_PWD|AI_APP_READONLY_PWD|AI_REVIEWER_PWD)
+      ORACLE_PWD|ORACLE_PDB|NOTIF_APP_OWNER_PWD|NOTIF_APP_RUNTIME_PWD|NOTIF_APP_READONLY_PWD|NOTIF_REVIEWER_PWD)
         if [[ -z "${!key:-}" ]]; then
           printf -v "$key" '%s' "$value"
           export "$key"
@@ -64,9 +64,9 @@ load_dotenv_if_present
 
 require_secret_var "ORACLE_PWD"
 require_secret_var "NOTIF_APP_OWNER_PWD"
-require_secret_var "AI_APP_RUNTIME_PWD"
-require_secret_var "AI_APP_READONLY_PWD"
-require_secret_var "AI_REVIEWER_PWD"
+require_secret_var "NOTIF_APP_RUNTIME_PWD"
+require_secret_var "NOTIF_APP_READONLY_PWD"
+require_secret_var "NOTIF_REVIEWER_PWD"
 
 [[ "$CONTAINER_NAME" == "oracle-notification-dispatch-lab-db" ]] || fail "Install target must remain oracle-notification-dispatch-lab-db."
 [[ -n "$ORACLE_PDB" ]] || fail "ORACLE_PDB must not be empty."
@@ -86,9 +86,9 @@ install_output="$(docker exec -i "$CONTAINER_NAME" sqlplus -L -S \
   "sys/${ORACLE_PWD}@localhost:1521/${ORACLE_PDB} as sysdba" \
   @"${REMOTE_DB_DIR}/install/install.sql" \
   "$NOTIF_APP_OWNER_PWD" \
-  "$AI_APP_RUNTIME_PWD" \
-  "$AI_APP_READONLY_PWD" \
-  "$AI_REVIEWER_PWD" \
+  "$NOTIF_APP_RUNTIME_PWD" \
+  "$NOTIF_APP_READONLY_PWD" \
+  "$NOTIF_REVIEWER_PWD" \
   "$REMOTE_DB_DIR" 2>&1)"
 install_status=$?
 set -e
@@ -103,4 +103,4 @@ if sqlplus_output_has_error "$install_output"; then
   fail "SQLPlus install output contained SP2-, ORA-, or PLS- errors."
 fi
 
-printf 'Oracle AI Lab controlled install completed.\n'
+printf 'Oracle Notification Dispatch Lab controlled install completed.\n'

@@ -1,4 +1,4 @@
--- Purpose: Controlled local Oracle AI Lab user and schema setup.
+-- Purpose: Controlled local Oracle Notification Dispatch Lab user and schema setup.
 -- This managed SQL file creates or updates only the local lab users required by
 -- the install workflow. It stores no secrets and receives passwords from
 -- db/install/install.sql substitution variables.
@@ -9,12 +9,12 @@ set heading on
 set verify off
 whenever sqlerror exit sql.sqlcode
 
-prompt Creating or updating Oracle AI Lab local users.
+prompt Creating or updating Oracle Notification Dispatch Lab local users.
 
 -- The install path must work on a clean disposable lab PDB. This helper keeps
 -- CREATE USER idempotent enough for repeated local installs by creating missing
 -- users and resetting expected attributes for users that already exist.
-create or replace procedure ORACLE_AI_LAB_ENSURE_USER (
+create or replace procedure NOTIF_LAB_ENSURE_USER (
   p_username in varchar2,
   p_password in varchar2,
   p_owner_schema in varchar2
@@ -28,11 +28,11 @@ begin
 
   if l_username not in (
     'NOTIF_APP_OWNER',
-    'AI_APP_RUNTIME',
-    'AI_APP_READONLY',
-    'AI_REVIEWER'
+    'NOTIF_APP_RUNTIME',
+    'NOTIF_APP_READONLY',
+    'NOTIF_REVIEWER'
   ) then
-    raise_application_error(-20010, 'Unexpected Oracle AI Lab user: ' || p_username);
+    raise_application_error(-20010, 'Unexpected Oracle Notification Dispatch Lab user: ' || p_username);
   end if;
 
   if p_password is null then
@@ -75,20 +75,20 @@ end;
 /
 
 begin
-  ORACLE_AI_LAB_ENSURE_USER('NOTIF_APP_OWNER', q'[&&NOTIF_APP_OWNER_PWD]', 'Y');
-  ORACLE_AI_LAB_ENSURE_USER('AI_APP_RUNTIME', q'[&&AI_APP_RUNTIME_PWD]', 'N');
-  ORACLE_AI_LAB_ENSURE_USER('AI_APP_READONLY', q'[&&AI_APP_READONLY_PWD]', 'N');
-  ORACLE_AI_LAB_ENSURE_USER('AI_REVIEWER', q'[&&AI_REVIEWER_PWD]', 'N');
+  NOTIF_LAB_ENSURE_USER('NOTIF_APP_OWNER', q'[&&NOTIF_APP_OWNER_PWD]', 'Y');
+  NOTIF_LAB_ENSURE_USER('NOTIF_APP_RUNTIME', q'[&&NOTIF_APP_RUNTIME_PWD]', 'N');
+  NOTIF_LAB_ENSURE_USER('NOTIF_APP_READONLY', q'[&&NOTIF_APP_READONLY_PWD]', 'N');
+  NOTIF_LAB_ENSURE_USER('NOTIF_REVIEWER', q'[&&NOTIF_REVIEWER_PWD]', 'N');
 end;
 /
 
 grant create session to NOTIF_APP_OWNER;
 grant create table to NOTIF_APP_OWNER;
 
-grant create session to AI_APP_RUNTIME;
-grant create session to AI_APP_READONLY;
-grant create session to AI_REVIEWER;
+grant create session to NOTIF_APP_RUNTIME;
+grant create session to NOTIF_APP_READONLY;
+grant create session to NOTIF_REVIEWER;
 
-drop procedure ORACLE_AI_LAB_ENSURE_USER;
+drop procedure NOTIF_LAB_ENSURE_USER;
 
-prompt Oracle AI Lab local users are ready for infrastructure install.
+prompt Oracle Notification Dispatch Lab local users are ready for infrastructure install.

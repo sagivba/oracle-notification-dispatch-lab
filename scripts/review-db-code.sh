@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Purpose: Static review workflow entry point for Oracle AI Lab DB code.
+# Purpose: Static review workflow entry point for Oracle Notification Dispatch Lab DB code.
 # It performs repository-only contract checks and validates the review report
 # template without connecting to Docker, Oracle, or organizational databases.
 

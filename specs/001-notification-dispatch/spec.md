@@ -56,12 +56,17 @@ The local owner password placeholder is:
 NOTIF_APP_OWNER_PWD
 ```
 
-Runtime, read-only, and reviewer schema names are not finalized in this specification.
+Runtime, read-only, and reviewer schema names are finalized as:
 
-The current open names are:
-- `AI_APP_RUNTIME`;
-- `AI_APP_READONLY`;
-- `AI_REVIEWER`.
+- `NOTIF_APP_RUNTIME`;
+- `NOTIF_APP_READONLY`;
+- `NOTIF_REVIEWER`.
+
+The matching local password placeholders are:
+
+- `NOTIF_APP_RUNTIME_PWD`;
+- `NOTIF_APP_READONLY_PWD`;
+- `NOTIF_REVIEWER_PWD`.
 
 ## Functional baseline
 

@@ -15,9 +15,9 @@ class TestRuntimeInstallPathFix(unittest.TestCase):
 
         for variable_name in [
             "NOTIF_APP_OWNER_PWD",
-            "AI_APP_RUNTIME_PWD",
-            "AI_APP_READONLY_PWD",
-            "AI_REVIEWER_PWD",
+            "NOTIF_APP_RUNTIME_PWD",
+            "NOTIF_APP_READONLY_PWD",
+            "NOTIF_REVIEWER_PWD",
         ]:
             with self.subTest(variable=variable_name):
                 self.assertIn(
@@ -70,16 +70,16 @@ class TestRuntimeInstallPathFix(unittest.TestCase):
         install_sql = (ROOT / "db/install/install.sql").read_text(encoding="utf-8")
         install_script = (ROOT / "scripts/install-db.sh").read_text(encoding="utf-8")
 
-        self.assertNotIn("Oracle AI Lab controlled install completed.", install_sql)
-        self.assertIn("Oracle AI Lab controlled install completed.", install_script)
+        self.assertNotIn("Oracle Notification Dispatch Lab controlled install completed.", install_sql)
+        self.assertIn("Oracle Notification Dispatch Lab controlled install completed.", install_script)
 
     def test_smoke_object_uses_explicit_remote_db_root(self) -> None:
         install_sql = (ROOT / "db/install/install.sql").read_text(encoding="utf-8")
         install_script = (ROOT / "scripts/install-db.sh").read_text(encoding="utf-8")
 
-        self.assertIn('define ORACLE_AI_LAB_DB_ROOT = "&5"', install_sql)
+        self.assertIn('define NOTIF_LAB_DB_ROOT = "&5"', install_sql)
         self.assertIn(
-            "@@&&ORACLE_AI_LAB_DB_ROOT/src/tables/lab_smoke_test.sql",
+            "@@&&NOTIF_LAB_DB_ROOT/src/tables/lab_smoke_test.sql",
             install_sql,
         )
         self.assertIn('"$REMOTE_DB_DIR" 2>&1)', install_script)

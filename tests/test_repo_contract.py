@@ -42,6 +42,8 @@ class TestRepositoryContract(unittest.TestCase):
             "docs/data-model/notification-dispatch-erd.md",
             "docs/data-model/notification-dispatch-erd.mmd",
             "docs/oracle-notification-dispatch-data-model-he.html",
+            "specs/001-notification-dispatch/spec.md",
+            "docs/decision-log.md",
         ]
 
         for relative_path in required_files:
@@ -183,6 +185,70 @@ class TestRepositoryContract(unittest.TestCase):
             for document in documents:
                 with self.subTest(table=table_name):
                     self.assertIn(table_name, document)
+
+    def test_decision_log_and_minimal_spec_capture_approved_baseline(self) -> None:
+        decision_log = (ROOT / "docs/decision-log.md").read_text(encoding="utf-8")
+        spec = (ROOT / "specs/001-notification-dispatch/spec.md").read_text(
+            encoding="utf-8"
+        )
+
+        for expected in [
+            "DEC-001",
+            "DEC-006",
+            "DEC-007",
+            "DEC-008",
+            "DEC-009",
+            "DEC-010",
+            "NOTIF_APP_OWNER",
+            "NOTIF_APP_OWNER_PWD",
+            "NOTIF_AUDIT_LOG",
+            "NOTIF_DISPATCH_REQUESTS",
+            "CLOB",
+            "unittest",
+            "AI_APP_RUNTIME",
+            "AI_APP_READONLY",
+            "AI_REVIEWER",
+        ]:
+            with self.subTest(expected=expected):
+                self.assertIn(expected, decision_log)
+
+        for expected in [
+            "docs/data-model/notification-dispatch-erd.md",
+            "docs/data-model/notification-dispatch-erd.mmd",
+            "docs/oracle-notification-dispatch-data-model-he.html",
+            "Do not invent an alternative data model",
+            "NOTIF_APP_OWNER",
+            "NOTIF_APP_OWNER_PWD",
+            "NOTIF_CHANNELS",
+            "NOTIF_STATUS_CODES",
+            "NOTIF_EXTERNAL_SYSTEMS",
+            "NOTIF_AUDIT_LOG",
+            "NOTIF_DISPATCH_REQUESTS",
+            "CLOB",
+            "target tables",
+            "primary keys",
+            "foreign keys",
+            "check constraints",
+            "SQL tests",
+            "partitioning",
+            "rollback behavior",
+            "success criteria",
+        ]:
+            with self.subTest(expected=expected):
+                self.assertIn(expected, spec)
+
+        combined = f"{decision_log}\n{spec}".lower()
+        for forbidden_boundary in [
+            "real email sending",
+            "real whatsapp integration",
+            "real telegram integration",
+            "real sms integration",
+            "external provider integration",
+            "organizational database access",
+            "secrets",
+        ]:
+            with self.subTest(boundary=forbidden_boundary):
+                self.assertIn(forbidden_boundary, combined)
 
 
 if __name__ == "__main__":
